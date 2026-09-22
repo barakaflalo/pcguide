@@ -161,6 +161,15 @@
   .about .card b{color:var(--text)}
   .disc{font-size:12px;color:var(--muted);border:1px solid var(--yellow);border-radius:10px;padding:12px 14px;margin-top:14px;background:color-mix(in srgb,var(--yellow) 6%,transparent)}
 </style>
+<link rel="stylesheet" href="pcg-upgrade.css">
+<script src="pcg-content.js"></script>
+<script src="pcg-learning.js"></script>
+<script src="pcg-depth.js"></script>
+<script src="pcg-paths.js"></script>
+<script src="pcg-state.js"></script>
+<script src="pcg-visuals.js"></script>
+<link rel="stylesheet" href="pcg-visuals.css">
+<link rel="stylesheet" href="pcg-pro.css">
 </head>
 <body>
 <header>
@@ -182,7 +191,7 @@
 const store=(()=>{let mem={};try{const k='__t';localStorage.setItem(k,'1');localStorage.removeItem(k);
   return{get:k=>localStorage.getItem(k),set:(k,v)=>localStorage.setItem(k,v),del:k=>localStorage.removeItem(k)};}
   catch(e){return{get:k=>k in mem?mem[k]:null,set:(k,v)=>mem[k]=String(v),del:k=>delete mem[k]};}})();
-const APP_VERSION="1.4.0";
+const APP_VERSION="3.0.0";
 
 /* ============================ i18n (UI) ============================ */
 const LANG={
@@ -1395,7 +1404,7 @@ function renderItem(c,id){
   ms.forEach(m=>d.appendChild(methodEl(m)));
 
   // arch note
-  if(it.archNote){const b=el('div','block');b.innerHTML=`<h4>🧩 ${esc(T('archNote'))} · ${P.arch==='x64'?'64-bit':'32-bit'}</h4><div class="warnbox txt">${esc(L(it.archNote))}</div>`;d.appendChild(b);}
+  if(it.archNote){const b=el('div','block');b.innerHTML=`<h4>🧩 ${esc(T('archNote'))} · ${P.arch==='arm64'?'ARM64':P.arch==='x64'?'64-bit':'32-bit'}</h4><div class="warnbox txt">${esc(L(it.archNote))}</div>`;d.appendChild(b);}
   // before
   if(it.before){const b=el('div','block');b.innerHTML=`<h4>⚠️ ${esc(T('before'))}</h4><div class="warnbox txt">${esc(L(it.before))}</div>`;d.appendChild(b);}
   // expected ok
@@ -1557,7 +1566,7 @@ function renderSettings(c){
       ${saved.provider?`<button class="btn ghost" id="aiDisc">${he?'נתק':'Disconnect'}</button>`:''}
     </div>
     <div id="aiStatus" style="margin-top:10px;font-size:14px;min-height:18px"></div>
-    <div style="margin-top:10px;font-size:12px;color:var(--muted)">🔒 ${he?'פיצ׳רי הבינה שולחים את הטקסט של השאלה לספק שבחרת. הכל שאר נשאר על המכשיר.':'AI features send your question text to the chosen provider. Everything else stays on-device.'}</div>`;
+    <div style="margin-top:10px;font-size:12px;color:var(--muted)">🔒 ${he?'העוזר שולח שאלה, הקשר וחלק מהשיחה לספק שבחרת.':'The assistant sends your question, context and recent conversation to your chosen provider.'}</div>`;
 
   const readKeys=()=>{const o=Object.assign({},keys);pr.fields.forEach(f=>{const i=document.getElementById('ai_'+f.k);if(i)o[f.k]=i.value.trim();});return o;};
   panel.querySelector('#aiSave').onclick=()=>{
@@ -1598,7 +1607,7 @@ function renderSettings(c){
   /* ---- Profile + danger ---- */
   const dz=el('div','detail');dz.style.marginTop='14px';
   dz.innerHTML=`<h2 style="font-size:19px">🖥️ ${he?'המחשב שלי':'My PC'}</h2>
-    <p class="sub">${esc(verLabel(P.winVer))} · ${P.arch==='x64'?'64-bit':'32-bit'} · ${P.sysLang==='he'?'עברית':'English'}</p>
+    <p class="sub">${esc(verLabel(P.winVer))} · ${P.arch==='arm64'?'ARM64':P.arch==='x64'?'64-bit':'32-bit'} · ${P.sysLang==='he'?'עברית':'English'}</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
       <button class="btn" onclick="openSetup()">${he?'שנה הגדרות מחשב':'Change PC settings'}</button>
       <button class="btn" onclick="openOnboarding(true)">${he?'📖 מדריך שימוש':'📖 How-to guide'}</button>
@@ -1773,7 +1782,7 @@ window.APPNEST_ASSISTANT_CONFIG={
   },
   readState:function(){
     let scr='home';try{scr=(stack[stack.length-1]||{}).screen||'home';}catch(e){}
-    const prof="פרופיל המחשב של המשתמש: "+verLabel(P.winVer)+" · "+(P.arch==='x64'?'64-bit':'32-bit')+" · שפת מערכת "+(P.sysLang==='he'?'עברית':'English')+".";
+    const prof="פרופיל המחשב של המשתמש: "+verLabel(P.winVer)+" · "+(P.arch==='arm64'?'ARM64':P.arch==='x64'?'64-bit':'32-bit')+" · שפת מערכת "+(P.sysLang==='he'?'עברית':'English')+".";
     return prof+"\nהמשתמש נמצא כרגע במסך: "+scr+".\n\nהפקודות שקיימות באפליקציה (לפי קטגוריה) — המלץ מתוכן והפנה אליהן:\n"+assistantCatalog();
   },
   tabs:[
@@ -1797,8 +1806,13 @@ window.APPNEST_ASSISTANT_CONFIG={
   ]
 };
 
+</script>
+<script src="pcg-upgrade.js"></script>
+<script src="pcg-pro.js"></script>
+<script>
 /* ============================ INIT ============================ */
 (function init(){
+  if(!window.PCG?.ready||!window.PCG_PRO?.ready){document.getElementById("app").textContent="חלק מקובצי המדריך חסרים. יש להעלות את כל הקבצים מהחבילה ולרענן. / Missing guide files. Upload the complete package and reload.";return;}
   loadProfile();
   applyDir();
   applyTheme(store.get('pcg_theme')||'gold');

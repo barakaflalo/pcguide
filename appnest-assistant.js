@@ -40,7 +40,7 @@
   }
 
   // מריץ prompt מול הספק המחובר, מחזיר טקסט. זורק אם אין מפתח/ספק.
-  async function callAI(prompt) {
+  async function callAI(prompt, signal) {
     var cfg = readAiConfig();
     if (!cfg || !cfg.provider) throw new Error('NO_AI');
     var p = cfg.provider, k = cfg.keys || {};
@@ -55,7 +55,7 @@
         if (models[i].indexOf('gemini-2.5') === 0 || models[i].indexOf('gemini-3') === 0) genCfg.thinkingConfig = { thinkingBudget: 0 };
         try {
           var r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + models[i] + ':generateContent?key=' + encodeURIComponent(key), {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            method: 'POST', signal: signal, headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: genCfg })
           });
           if (r.ok) {
@@ -72,7 +72,7 @@
 
     if (p === 'claude') {
       var res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
+        method: 'POST', signal: signal,
         headers: { 'Content-Type': 'application/json', 'x-api-key': firstKey(k.claude),
           'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
         body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 4000, messages: [{ role: 'user', content: prompt }] })
@@ -90,7 +90,7 @@
     else throw new Error('UNKNOWN_PROVIDER');
     var h = { 'Content-Type': 'application/json' };
     if (okey) h['Authorization'] = 'Bearer ' + okey;
-    var ro = await fetch(url, { method: 'POST', headers: h,
+    var ro = await fetch(url, { method: 'POST', signal: signal, headers: h,
       body: JSON.stringify({ model: model, max_tokens: 4000, messages: [{ role: 'user', content: prompt }] }) });
     if (!ro.ok) { var eo = await ro.json().catch(function () { return {}; }); throw new Error((eo.error && eo.error.message) || ('HTTP ' + ro.status)); }
     var do_ = await ro.json();
@@ -219,7 +219,7 @@
       (fieldState || '(אין שדות)'),
       (appState ? '\nמצב האפליקציה כרגע:\n' + appState : ''),
       '',
-      'כללים: דבר בעברית, טבעי וידידותי. תמיד כתוב קודם תשובה קצרה למשתמש, ורק אחריה (אם צריך) את בלוק הפעולה.',
+      'כללים: ענה בשפת המשתמש או בשפת הממשק: '+document.documentElement.lang+'. תמיד כתוב קודם תשובה קצרה למשתמש, ורק אחריה (אם צריך) את בלוק הפעולה.',
       'אם המשתמש מבקש ליצור או לשנות תוכן (שיר, טקסט) — כתוב את התוצאה המלאה בתוך writeField, לא בגוף הצ\'אט.',
       'אם המשתמש מבקש לשפר/לשנות/לתרגם משהו "שכתבתי" — התבסס על התוכן הנוכחי של השדות למעלה.',
       'לניווט (navigate): השתמש אך ורק בשם מסך שמופיע בדיוק ברשימת המסכים למעלה. אם המשתמש מבקש מסך שלא ברשימה — אל תנחש ואל תנווט למסך אחר; במקום זה אמור לו בקצרה שאין מסך כזה, או שאל למה התכוון.',
@@ -245,8 +245,10 @@
   // זיכרון מתמשך — השיחה נשמרת מקומית (localStorage) ונטענת בביקור הבא.
   // מפתח ייחודי לכל אפליקציה, כדי שאפליקציות שונות לא יחלקו זיכרון.
   var HKEY = 'appnest_asst_hist_' + (CFG.appName || 'app');
-  function loadHistory() { try { return JSON.parse(localStorage.getItem(HKEY)) || []; } catch (e) { return []; } }
+  function loadHistory() { try { var a=JSON.parse(localStorage.getItem(HKEY)); return Array.isArray(a)?a.filter(function(m){return m && (m.role==='user'||m.role==='bot') && typeof m.text==='string';}).slice(-30).map(function(m){return {role:m.role,text:m.text.slice(0,16000)};}):[]; } catch (e) { return []; } }
   function saveHistory() { try { localStorage.setItem(HKEY, JSON.stringify(history.slice(-30))); } catch (e) {} }
+  var requestEpoch=0, requestAbort=null, activeRecognition=null;
+  function ui(he,en){return document.documentElement.lang==='en'?en:he;}
   var history = loadHistory(), panelEl = null, bodyEl = null, panelInput = null, panelSend = null, busy = false, open = false;
 
   function el(tag, css, txt) { var e = document.createElement(tag); if (css) e.style.cssText = css; if (txt != null) e.textContent = txt; return e; }
@@ -261,7 +263,7 @@
     if (!window.speechSynthesis) return;
     stopSpeak();
     var u = new SpeechSynthesisUtterance(text);
-    u.lang = 'he-IL'; u.rate = 1;
+    u.lang = ui('he-IL','en-US'); u.rate = 1;
     u.onend = function () { if (btn) btn.textContent = '🔊'; if (activePlayBtn === btn) activePlayBtn = null; };
     if (btn) { btn.textContent = '⏹'; activePlayBtn = btn; }
     window.speechSynthesis.speak(u);
@@ -301,19 +303,21 @@
 
   function setBusy(v) {
     busy = v;
-    if (panelSend) { panelSend.disabled = v; panelSend.style.opacity = v ? '.5' : '1'; panelSend.textContent = v ? '…' : 'שלח'; }
+    if (panelSend) { panelSend.disabled = v; panelSend.style.opacity = v ? '.5' : '1'; panelSend.textContent = v ? '…' : ui('שלח','Send'); }
     if (panelInput) { panelInput.disabled = v; }
   }
 
   async function send(input) {
     if (busy) return;                          // מונע שליחה כפולה בזמן שהעוזר עונה
     var msg = input.value.trim(); if (!msg) return;
+    var epoch=requestEpoch; requestAbort=new AbortController();
     input.value = ''; addBubble('user', msg);
-    var thinking = addBubble('bot', '…חושב');
+    var thinking = addBubble('bot', ui('…חושב','Thinking…'));
     setBusy(true);
     try {
       var prompt = buildPrompt(history, msg);
-      var raw = await callAI(prompt);
+      var raw = await callAI(prompt, requestAbort.signal);
+      if(epoch!==requestEpoch)return;
       var parsed = parseReply(raw);
       thinking.textContent = parsed.text || '✓';
       history.push({ role: 'user', text: msg });
@@ -322,17 +326,18 @@
       saveHistory();
       // מבצע את הפעולות לפי הסדר, עם השהיה קטנה בין פעולות כדי לתת למסך להתעדכן
       for (var ai = 0; ai < parsed.actions.length; ai++) {
+        if(epoch!==requestEpoch)return;
         var fb = runAction(parsed.actions[ai]);
         if (fb) addBubble('bot', fb);
         else addBubble('bot', 'ניסיתי לבצע פעולה אבל לא מצאתי את היעד באפליקציה.');
         if (ai < parsed.actions.length - 1) await new Promise(function (r) { setTimeout(r, 450); });
       }
     } catch (e) {
-      if (e.message === 'NO_AI') thinking.textContent = 'כדי לדבר איתי, חבר קודם מפתח AI בהגדרות הבינה של האפליקציה 🔌';
-      else thinking.textContent = 'אופס, משהו השתבש: ' + e.message;
+      if(epoch!==requestEpoch||e.name==='AbortError')return;
+      if (e.message === 'NO_AI') thinking.textContent = ui('כדי לדבר איתי, חבר קודם ספק AI בהגדרות האפליקציה 🔌','Connect an AI provider in Settings to use the assistant 🔌');
+      else thinking.textContent = ui('הבקשה נכשלה: ','Request failed: ') + e.message;
     } finally {
-      setBusy(false);
-      if (panelInput) panelInput.focus();
+      if(epoch===requestEpoch){setBusy(false);if (panelInput) panelInput.focus();}
     }
   }
 
@@ -353,26 +358,26 @@
       'background:#141418;border:1px solid #2e2e38;border-radius:16px;z-index:100000;display:none;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.55);');
     var head = el('div', 'padding:12px 14px;background:linear-gradient(90deg,#1a1a20,#141418);border-bottom:1px solid #2e2e38;display:flex;align-items:center;gap:8px;');
     head.appendChild(el('span', 'font-size:17px;', '🪄'));
-    head.appendChild(el('span', 'color:#C9A84C;font:600 15px "Segoe UI",sans-serif;', 'עוזר ' + CFG.appName));
-    var clr = el('span', 'margin-right:auto;cursor:pointer;color:#888;font-size:15px;line-height:1;', '🗑️');
-    clr.title = 'נקה שיחה';
+    head.appendChild(el('span', 'color:#C9A84C;font:600 15px "Segoe UI",sans-serif;', ui('עוזר · מדריך המחשב','Assistant · PC Guide')));
+    var clr = el('button', 'margin-right:auto;cursor:pointer;color:#888;font-size:15px;line-height:1;', '🗑️');
+    clr.title = ui('נקה שיחה','Clear conversation'); clr.setAttribute('aria-label',clr.title);
     clr.onclick = clearChat;
     head.appendChild(clr);
-    var x = el('span', 'cursor:pointer;color:#888;font-size:20px;line-height:1;', '×');
-    x.onclick = toggle; head.appendChild(x);
+    var x = el('button', 'cursor:pointer;color:#888;font-size:20px;line-height:1;', '×');
+    x.setAttribute('aria-label',ui('סגור','Close')); x.onclick = toggle; head.appendChild(x);
     bodyEl = el('div', 'flex:1;overflow-y:auto;padding:12px;');
     var foot = el('div', 'padding:10px;border-top:1px solid #2e2e38;display:flex;gap:8px;align-items:center;');
     var inp = el('input', 'flex:1;background:#0d0d11;border:1px solid #2e2e38;border-radius:20px;padding:9px 14px;color:#eee;font:14px "Segoe UI",sans-serif;direction:rtl;outline:none;');
-    inp.placeholder = 'שאל אותי משהו, או בקש עזרה…';
+    inp.placeholder = ui('שאל אותי משהו, או בקש עזרה…','Ask a question or request help…'); inp.setAttribute('aria-label',inp.placeholder);
     inp.onkeydown = function (ev) { if (ev.key === 'Enter') send(inp); };
     // כפתור מיקרופון — דיבור לטקסט (Web Speech API, חינם, מובנה בדפדפן)
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SR) {
-      var rec = new SR();
-      rec.lang = 'he-IL'; rec.interimResults = false; rec.maxAlternatives = 1;
+      var rec = new SR(); activeRecognition=rec;
+      rec.lang = ui('he-IL','en-US'); rec.interimResults = false; rec.maxAlternatives = 1;
       var listening = false, micGranted = false;
       var mic = el('button', 'background:#2a2a33;color:#C9A84C;border:none;border-radius:50%;width:38px;height:38px;font-size:17px;cursor:pointer;flex-shrink:0;', '🎤');
-      mic.title = 'דבר במקום להקליד';
+      mic.title = ui('דבר במקום להקליד','Dictate a message');
       rec.onresult = function (e) { inp.value = e.results[0][0].transcript; inp.focus(); };
       rec.onend = function () { listening = false; mic.style.background = '#2a2a33'; };
       rec.onerror = function (ev) {
@@ -400,7 +405,7 @@
       };
       foot.appendChild(mic);
     }
-    var snd = el('button', 'background:#C9A84C;color:#0B0B0F;border:none;border-radius:20px;padding:0 16px;height:38px;font:600 14px "Segoe UI",sans-serif;cursor:pointer;flex-shrink:0;', 'שלח');
+    var snd = el('button', 'background:#C9A84C;color:#0B0B0F;border:none;border-radius:20px;padding:0 16px;height:38px;font:600 14px "Segoe UI",sans-serif;cursor:pointer;flex-shrink:0;', ui('שלח','Send'));
     snd.onclick = function () { send(inp); };
     foot.appendChild(inp); foot.appendChild(snd);
     panelEl.appendChild(head); panelEl.appendChild(bodyEl); panelEl.appendChild(foot);
@@ -415,16 +420,18 @@
     if (history.length) {
       history.forEach(function (m) { addBubble(m.role === 'user' ? 'user' : 'bot', m.text); });
     } else {
-      addBubble('bot', 'היי! אני העוזר של ' + CFG.appName + '. אפשר לשאול אותי כל דבר, לבקש שאכתוב תוכן ישר לאפליקציה, או לעזור לך למצוא דברים. במה אעזור?');
+      addBubble('bot', ui('היי, אפשר לשאול על פקודות והסברים במדריך. העוזר דורש חיבור לספק בהגדרות. אין לשלוח סיסמאות או מידע שאינו דרוש לשאלה.','Hi, ask about commands and explanations in the guide. The assistant requires a provider connection in Settings. Do not send passwords or unnecessary personal information.'));
       if (panelInput) addSuggestions(panelInput);
     }
   }
 
   function clearChat() {
-    history = []; saveHistory(); stopSpeak();
-    renderConversation();
+    requestEpoch++; if(requestAbort)requestAbort.abort(); if(activeRecognition){try{activeRecognition.abort();}catch(e){}}
+    history=[]; try{localStorage.removeItem(HKEY);}catch(e){} stopSpeak(); setBusy(false);
+    if(panelInput)panelInput.value=''; if(bodyEl)renderConversation();
   }
 
+  window.AppNestAssistant={clearHistory:clearChat};
   function toggle() {
     if (!panelEl) buildPanel();
     open = !open;
@@ -434,7 +441,7 @@
   function addButton() {
     if (document.getElementById('appnest-assistant-btn')) return;
     var b = el('button', 'position:fixed;bottom:16px;left:16px;z-index:100000;background:#C9A84C;color:#0B0B0F;border:none;' +
-      'border-radius:24px;padding:10px 18px;font:600 15px "Segoe UI",sans-serif;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.4);', '🪄 עוזר');
+      'border-radius:24px;padding:10px 18px;font:600 15px "Segoe UI",sans-serif;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.4);', ui('🪄 עוזר','🪄 Assistant'));
     b.id = 'appnest-assistant-btn';
     b.onclick = toggle;
     document.body.appendChild(b);

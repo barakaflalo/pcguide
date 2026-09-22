@@ -1,0 +1,60 @@
+{
+  "title": "Microsoft Windows screenshot provenance",
+  "verifiedOn": "2026-09-22",
+  "copyright": "© Microsoft. Original screenshots remain unmodified; numbered explanations are rendered separately in HTML.",
+  "notes": [
+    "Windows version is taken from the source article section or explicit Microsoft image caption.",
+    "Screenshots use an English Windows interface and may differ from the installed build.",
+    "These screenshots are illustrative source material, not captures of the user’s computer."
+  ],
+  "screenshots": [
+    {
+      "file": "win11-volume-mixer.png",
+      "version": "Windows 11",
+      "source": "https://support.microsoft.com/en-us/windows/hardware/audio/fix-sound-or-audio-problems-in-windows",
+      "image": "https://support.microsoft.com/en-us/windows/media/sound-settings-volume-mixer-png.png",
+      "evidence": "General audio troubleshooting in Windows 11 > Step 5. Check sound settings; image caption explicitly names Windows 11 Volume mixer.",
+      "bytes": 37667,
+      "sha256": "629dee5a0764de3d2b12a87347f4fd027f7d9bcce098e95df60d00b3eca10d30",
+      "width": 500,
+      "height": 358,
+      "visuallyVerified": true
+    },
+    {
+      "file": "win10-volume-mixer.png",
+      "version": "Windows 10",
+      "source": "https://support.microsoft.com/en-us/windows/hardware/audio/fix-sound-or-audio-problems-in-windows",
+      "image": "https://support.microsoft.com/en-us/windows/media/volume-mixer-with-mute-volume-png.png",
+      "evidence": "General audio troubleshooting in Windows 10 > Step 5. Check sound settings; caption: Volume mixer with muted volume controls.",
+      "bytes": 21823,
+      "sha256": "9f3f19e1523ddaabab7f26bb5db12b119aa30ee06d5aaedaa153d549077b037d",
+      "width": 520,
+      "height": 435,
+      "visuallyVerified": true
+    },
+    {
+      "file": "win10-sound-output.png",
+      "version": "Windows 10",
+      "source": "https://support.microsoft.com/en-us/windows/hardware/audio/fix-sound-or-audio-problems-in-windows",
+      "image": "https://support.microsoft.com/en-us/windows/media/sound-output-device-properties-png.png",
+      "evidence": "General audio troubleshooting in Windows 10 > Step 5. Check sound settings; the image follows the Windows 10 Device properties steps.",
+      "bytes": 21644,
+      "sha256": "da9291f0a89c3ccde9ebb4f195cd2c98fa795c2975a183019ca98b16126d254f",
+      "width": 558,
+      "height": 454,
+      "visuallyVerified": true
+    },
+    {
+      "file": "win11-backup.png",
+      "version": "Windows 11",
+      "source": "https://support.microsoft.com/en-us/windows/experience/backup-recovery/windows-backup-settings-catalog",
+      "image": "https://support.microsoft.com/en-us/windows/media/windows-backup-settings-1.png",
+      "evidence": "Explicit Microsoft image caption: Screenshot of Settings > Accounts > Windows backup in Windows 11.",
+      "bytes": 108435,
+      "sha256": "057fc7abccfacc3048989c1617ab4dab223c57dc5c4c87963321b93a6761449c",
+      "width": 1129,
+      "height": 796,
+      "visuallyVerified": true
+    }
+  ]
+}

@@ -1,125 +1,24 @@
-<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0a0a0a">
-<title>מדיניות פרטיות · מדריך המחשב · AppNest</title>
-<style>
-  :root{--bg:#0a0a0a;--surface:#151515;--border:#2c2c2c;--text:#f1ead6;--muted:#9a927e;--accent:#d4af37}
-  *{box-sizing:border-box}
-  body{margin:0;font-family:'Segoe UI','Assistant',system-ui,-apple-system,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
-  .wrap{max-width:760px;margin:0 auto;padding:28px 18px 60px}
-  h1{font-size:24px;margin:0 0 4px;display:flex;align-items:center;gap:10px}
-  h1 .dot{width:11px;height:11px;border-radius:3px;background:var(--accent);box-shadow:0 0 10px var(--accent)}
-  h2{font-size:18px;margin:26px 0 8px;color:var(--accent)}
-  .meta{color:var(--muted);font-size:13px;margin:0 0 20px}
-  .toggle{display:flex;gap:8px;margin:14px 0 24px}
-  .toggle button{border:1px solid var(--border);background:var(--surface);color:var(--text);padding:8px 16px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:14px}
-  .toggle button.on{background:var(--accent);color:#0a0a0a;border-color:var(--accent);font-weight:700}
-  section{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:20px 22px;margin-bottom:14px}
-  p{margin:6px 0;font-size:15px}
-  ul{margin:6px 0;padding-inline-start:22px}
-  li{margin:5px 0;font-size:15px}
-  a{color:var(--accent)}
-  .lang-en{display:none;direction:ltr;text-align:left}
-  body.en .lang-he{display:none}
-  body.en .lang-en{display:block}
-  body.en{direction:ltr}
-  .back{display:inline-block;margin-top:20px;color:var(--accent);text-decoration:none;font-size:14px}
-  .foot{color:var(--muted);font-size:12px;text-align:center;margin-top:26px}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <h1><span class="dot"></span><span class="lang-he">מדיניות פרטיות</span><span class="lang-en">Privacy Policy</span></h1>
-  <p class="meta"><span class="lang-he">מדריך המחשב · AppNest · © 2026</span><span class="lang-en">PC Guide · AppNest · © 2026</span></p>
-
-  <div class="toggle">
-    <button id="btnHe" class="on" onclick="setLang('he')">עברית</button>
-    <button id="btnEn" onclick="setLang('en')">English</button>
-  </div>
-
-  <!-- ===================== HEBREW ===================== -->
-  <div class="lang-he">
-    <section>
-      <h2>בקצרה</h2>
-      <p>האפליקציה היא מדריך לימודי לפקודות ולקיצורי מקשים של Windows. היא פועלת כולה על המכשיר שלך. אין שרת, אין חשבון, אין מעקב ואין פרסום. אנחנו לא אוספים ולא רואים שום מידע עליך.</p>
-    </section>
-    <section>
-      <h2>מה נשמר על המכשיר</h2>
-      <ul>
-        <li>ההעדפות שלך: שפת התצוגה, ערכת הצבע, ופרופיל "המחשב שלי" (גרסת Windows, ארכיטקטורה, שפת מערכת).</li>
-        <li>רשימת המועדפים שסימנת.</li>
-      </ul>
-      <p>כל אלה נשמרים ב-localStorage בדפדפן שלך בלבד, ולא עוזבים את המכשיר. מחיקת נתוני האתר בדפדפן, או הסרת ההתקנה, מוחקת אותם.</p>
-    </section>
-    <section>
-      <h2>מה נשלח החוצה</h2>
-      <p>שום מידע אישי לא נשלח לשום מקום. תוכן הפקודות מוטמע בתוך האפליקציה ועובד גם ללא חיבור לאינטרנט.</p>
-      <p>קישורי "מקור רשמי" בכרטיסים מובילים לאתרי התיעוד של Microsoft. לחיצה עליהם פותחת אתר חיצוני שאינו בשליטתנו וכפוף למדיניות שלו.</p>
-    </section>
-    <section>
-      <h2>הרשאות</h2>
-      <p>האפליקציה אינה מבקשת הרשאות למצלמה, מיקרופון, מיקום או אנשי קשר. פעולת "שתף" משתמשת בתפריט השיתוף של המכשיר רק כאשר תבחר להשתמש בה.</p>
-    </section>
-    <section>
-      <h2>חשוב לדעת — הסרת אחריות</h2>
-      <p>האפליקציה מלמדת ומעתיקה פקודות בלבד; היא אינה מריצה דבר בעצמה. הרצת פקודות היא באחריותך. פקודות המסומנות באדום עלולות לשנות הגדרות מערכת או למחוק מידע — ודא שאתה מבין מה הן עושות לפני הרצה. איננו אחראים לנזק שנגרם משימוש בפקודות.</p>
-    </section>
-    <section>
-      <h2>יצירת קשר</h2>
-      <p>שאלות או בקשות: <a href="mailto:appnest55@gmail.com">appnest55@gmail.com</a></p>
-    </section>
-  </div>
-
-  <!-- ===================== ENGLISH ===================== -->
-  <div class="lang-en">
-    <section>
-      <h2>In short</h2>
-      <p>This app is an educational guide to Windows commands and keyboard shortcuts. It runs entirely on your device. There is no server, no account, no tracking and no ads. We do not collect or see any information about you.</p>
-    </section>
-    <section>
-      <h2>What is stored on your device</h2>
-      <ul>
-        <li>Your preferences: display language, color theme, and your "My PC" profile (Windows version, architecture, system language).</li>
-        <li>The favorites you mark.</li>
-      </ul>
-      <p>All of this is kept in your browser's localStorage only and never leaves the device. Clearing the site's data, or uninstalling, removes it.</p>
-    </section>
-    <section>
-      <h2>What is sent out</h2>
-      <p>No personal information is sent anywhere. The command content is embedded in the app and works without an internet connection.</p>
-      <p>The "official source" links on cards point to Microsoft's documentation. Tapping them opens an external site we don't control, subject to its own policy.</p>
-    </section>
-    <section>
-      <h2>Permissions</h2>
-      <p>The app requests no camera, microphone, location or contacts permissions. The "Share" action uses your device's share sheet only when you choose to use it.</p>
-    </section>
-    <section>
-      <h2>Important — disclaimer</h2>
-      <p>The app only teaches and copies commands; it never runs anything itself. Running commands is at your own risk. Commands marked red may change system settings or delete data — be sure you understand them before running. We are not responsible for any damage from using the commands.</p>
-    </section>
-    <section>
-      <h2>Contact</h2>
-      <p>Questions or requests: <a href="mailto:appnest55@gmail.com">appnest55@gmail.com</a></p>
-    </section>
-  </div>
-
-  <a class="back" href="index.html">⟵ <span class="lang-he">חזרה לאפליקציה</span><span class="lang-en">Back to the app</span></a>
-  <div class="foot">AppNest · barakaflalo.github.io/appnest</div>
-</div>
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>פרטיות · PC Guide</title><style>body{margin:0;background:#101317;color:#edf1f5;font:16px/1.9 system-ui,sans-serif}main{max-width:780px;margin:auto;padding:40px 24px 80px}h1{font-size:34px;line-height:1.3}h2{font-size:20px;color:#ddbd65;margin-top:32px}p{color:#c0c8d2}a{color:#ddbd65}nav{display:flex;gap:20px;flex-wrap:wrap}button{font:inherit;background:#202832;border:1px solid #63717f;border-radius:8px;color:white;padding:6px 14px;cursor:pointer}.date{font-size:13px;color:#95a4b3}.box{border-inline-start:3px solid #ddbd65;background:#19212b;padding:16px 22px;border-radius:10px}</style></head>
+<body><main><nav><a href="index.html" id="back">בחזרה למדריך</a><button id="language" type="button">English</button></nav><article id="content"></article></main>
 <script>
-function setLang(l){
-  document.body.classList.toggle('en', l==='en');
-  document.documentElement.lang = l;
-  document.documentElement.dir = l==='he' ? 'rtl' : 'ltr';
-  document.getElementById('btnHe').classList.toggle('on', l==='he');
-  document.getElementById('btnEn').classList.toggle('on', l==='en');
-}
-// follow ?lang= if the app passes it
-var q=new URLSearchParams(location.search).get('lang');
-if(q==='en') setLang('en');
-</script>
-</body>
-</html>
+const copy={he:`<h1>פרטיות ונתונים</h1><p class="date">מדריך המחשב · AppNest · גרסה 3.0 · עודכן 23.09.2026</p>
+<p class="box">המדריך הבסיסי פועל בדפדפן בלי חשבון. הוא אינו סורק את המחשב, אינו קורא קובצי מערכת ואינו מריץ את פקודות Windows שמוצגות בו.</p>
+<h2>מה נשמר בדפדפן?</h2><p>הפרופיל שבחרת, שפת הממשק, ערכת הצבעים, מועדפים, התקדמות בתרגולים ובמסלולי פתרון, והשלמת מדריך הפתיחה נשמרים ב־localStorage. אם חיברת עוזר חכם, גם פרטי החיבור ומפתחות ה־API נשמרים שם. שיחת העוזר נשמרת מקומית, עד 30 הודעות. נתונים אלה אינם מסונכרנים אוטומטית בין מכשירים.</p>
+<h2>העוזר החכם הוא חיבור נפרד</h2><p>בעת שליחת שאלה או בדיקת חיבור, הדפדפן פונה לספק שבחרת. הבקשה יכולה לכלול מפתח API, טקסט שאלה, עד 12 הודעות קודמות, פרופיל Windows שבחרת, המסך הנוכחי וקטלוג המדריך. הספק מטפל בנתונים לפי התנאים ומדיניות הפרטיות שלו. כתובת מקומית או מותאמת אישית מקבלת את הבקשות בהתאם להגדרותיך. אין צורך בעוזר כדי להשתמש בקטלוג, בתרגולים או במסלולים.</p>
+<h2>הכתבה והקראה</h2><p>כפתור המיקרופון בעוזר מפעיל זיהוי דיבור רק לאחר לחיצה והרשאת הדפדפן. לפי הדפדפן ומערכת ההפעלה, אודיו עשוי להישלח לשירות זיהוי דיבור. המדריך אינו שומר קובץ הקלטה. הטקסט המזוהה מוכנס לשדה ההודעה ונשלח לעוזר רק כאשר בוחרים לשלוח. הקראה משתמשת במנגנון הדיבור של הדפדפן; זמינות קולות ועיבוד מקומי תלויים במכשיר.</p>
+<h2>אתר, קישורים ועבודה ללא רשת</h2><p>טעינת האתר מ־GitHub Pages כרוכה בבקשת רשת לשרת המארח, שיכול לקבל מידע טכני רגיל כגון כתובת IP ופרטי דפדפן. המדריך אינו מוסיף שירות ניתוח שימוש או פרסום. קישורים למקורות ולספקים נפתחים באתרים חיצוניים. לאחר טעינה ראשונה מוצלחת, דפדפן שתומך ב־Service Worker שומר את קובצי המדריך במטמון לשימוש אופליין. מקורות חיצוניים ועוזר חכם דורשים רשת.</p>
+<h2>גיבוי ומחיקה</h2><p>ייצוא גיבוי מוריד קובץ JSON עם פרופיל, ערכת צבע, מועדפים והתקדמות בלבד. הוא אינו כולל מפתחות API או היסטוריית שיחה. ייבוא מחליף את השדות הכלולים לאחר בדיקת תקינות. „מחק את כל הנתונים” בהגדרות מוחק את העדפות המדריך, ההתקדמות, החיבורים ושיחת העוזר מהדפדפן הזה. הוא אינו מוחק בקשות שכבר התקבלו אצל ספק חיצוני. לניקוי גם של קובצי האתר במטמון, השתמש בהגדרות נתוני האתר בדפדפן.</p>
+<h2>מחשב משותף</h2><p>מפתחות ושיחות נשמרים בדפדפן ללא הצפנה ייעודית של האפליקציה. במחשב משותף מומלץ לנתק את העוזר ולמחוק את הנתונים בסיום. הימנע מהזנת סיסמאות או מידע שאינו דרוש לשאלה.</p>`,
+en:`<h1>Privacy & data</h1><p class="date">PC Guide · AppNest · Version 3.0 · Updated September 22, 2026</p>
+<p class="box">The core guide runs in your browser without an account. It does not scan your PC, read system files or execute the Windows commands it displays.</p>
+<h2>What stays in the browser?</h2><p>Your selected profile, interface language, theme, favorites, exercise progress, scenario stages and selected troubleshooting answers, and onboarding status are stored in localStorage. If you connect the optional assistant, connection settings and API keys are also stored there. Up to 30 assistant messages are stored locally. This data does not automatically sync between devices.</p>
+<h2>The assistant is a separate connection</h2><p>When you send a question or test a connection, the browser contacts your selected provider. Requests may include an API key, your question, up to 12 previous messages, your selected Windows profile, the current screen and the guide catalog. The provider processes data under its own terms and privacy policy. Local and custom endpoints receive requests according to your settings. The catalog, exercises and troubleshooting flows do not require the assistant.</p>
+<h2>Voice input and speech</h2><p>The assistant’s microphone button starts speech recognition only after a click and browser permission. Depending on your browser and operating system, audio may be sent to a speech-recognition service. The guide does not save an audio recording. Recognized text enters the message field and is sent to the assistant only when you choose to send it. Read-aloud uses browser speech synthesis; available voices and local processing depend on your device.</p>
+<h2>Hosting, links and offline use</h2><p>Loading the site from GitHub Pages sends a request to the host, which may receive ordinary technical data such as IP address and browser information. The guide does not add analytics or advertising services. Documentation and provider links open external websites. After a successful first load, a browser supporting Service Workers caches the guide files for offline use. External documentation and the assistant need a network connection.</p>
+<h2>Backup and deletion</h2><p>Export downloads a JSON file containing only the profile, theme, favorites and progress. API keys and conversations are excluded. Import validates and replaces the included fields. “Delete all data” in Settings removes the guide’s local preferences, progress, connections and assistant conversation from this browser. It cannot erase requests already received by external providers. To also remove cached site files, use your browser’s site-data settings.</p>
+<h2>Shared computers</h2><p>Keys and conversations are stored in the browser without application-level encryption. On a shared computer, disconnect the assistant and delete local data when finished. Avoid entering passwords or information that is not needed for your question.</p>`};
+let lang=new URLSearchParams(location.search).get('lang')==='en'?'en':'he';
+function show(){document.documentElement.lang=lang;document.documentElement.dir=lang==='he'?'rtl':'ltr';document.getElementById('content').innerHTML=copy[lang];document.getElementById('language').textContent=lang==='he'?'English':'עברית';document.getElementById('back').textContent=lang==='he'?'בחזרה למדריך':'Back to the guide';document.title=lang==='he'?'פרטיות · מדריך המחשב':'Privacy · PC Guide';}
+document.getElementById('language').onclick=()=>{lang=lang==='he'?'en':'he';show();};show();
+</script></body></html>
