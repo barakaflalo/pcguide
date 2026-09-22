@@ -169,6 +169,7 @@
     <div class="spacer"></div>
     <div class="pcchip" id="pcChip" onclick="openSetup()" title="המחשב שלי"></div>
     <button class="iconbtn" onclick="openThemes()" title="ערכת צבע">🎨</button>
+    <button class="iconbtn" onclick="go('settings')" title="הגדרות">⚙️</button>
     <button class="iconbtn" onclick="go('about')" title="אודות">ℹ️</button>
   </div>
 </header>
@@ -181,7 +182,7 @@
 const store=(()=>{let mem={};try{const k='__t';localStorage.setItem(k,'1');localStorage.removeItem(k);
   return{get:k=>localStorage.getItem(k),set:(k,v)=>localStorage.setItem(k,v),del:k=>localStorage.removeItem(k)};}
   catch(e){return{get:k=>k in mem?mem[k]:null,set:(k,v)=>mem[k]=String(v),del:k=>delete mem[k]};}})();
-const APP_VERSION="1.1.0";
+const APP_VERSION="1.2.0";
 
 /* ============================ i18n (UI) ============================ */
 const LANG={
@@ -762,8 +763,123 @@ ITEMS.push(
  methods:[{type:"shortcut",value:"F2",best:true,compat:Y}]}
 );
 
+/* ---------- BATCH 3: more commands ---------- */
+ITEMS.push(
+{id:"net-getmac",cat:"network",risk:"green",admin:false,compat:Y,
+ title:{he:"כתובת MAC של המתאמים",en:"Adapter MAC address"},
+ desc:{he:"מציג את כתובות ה-MAC הפיזיות של מתאמי הרשת.",en:"Shows the physical MAC addresses of network adapters."},
+ kw:{he:["mac","getmac","כתובת פיזית"],en:["mac","getmac","physical address"]},
+ methods:[{type:"cmd",value:"getmac /v",best:true,compat:Y}],
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/getmac"},
+
+{id:"net-arp",cat:"network",risk:"green",admin:false,compat:Y,
+ title:{he:"מכשירים ברשת המקומית (arp)",en:"Devices on the local network (arp)"},
+ desc:{he:"מציג את המכשירים שהמחשב תקשר איתם לאחרונה ברשת (IP מול MAC).",en:"Lists devices the PC recently talked to on the LAN (IP vs MAC)."},
+ kw:{he:["arp","מכשירים ברשת","מי מחובר","טבלת arp"],en:["arp","lan devices","who's connected"]},
+ methods:[{type:"cmd",value:"arp -a",best:true,compat:Y}],
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/arp"},
+
+{id:"net-wifipass",cat:"network",risk:"yellow",admin:false,compat:FROMVISTA,
+ title:{he:"הצגת סיסמת Wi-Fi שמורה",en:"Show saved Wi-Fi password"},
+ desc:{he:"מציג את הסיסמה של רשת Wi-Fi שהמחשב כבר התחבר אליה בעבר.",en:"Reveals the password of a Wi-Fi network this PC connected to before."},
+ kw:{he:["סיסמת wifi","wifi password","רשת אלחוטית","netsh wlan"],en:["wifi password","wireless key","netsh wlan"]},
+ methods:[{type:"cmd",value:'netsh wlan show profile name="שם הרשת" key=clear',best:true,compat:FROMVISTA}],
+ before:{he:"החלף \"שם הרשת\" בשם הרשת המדויק. הסיסמה תופיע בשדה 'Key Content'.",en:"Replace \"שם הרשת\" with the exact network name. The password shows under 'Key Content'."},
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/netsh"},
+
+{id:"sys-terminal",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"פתיחת שורת פקודה / PowerShell",en:"Open Command Prompt / PowerShell"},
+ desc:{he:"פותח טרמינל להרצת פקודות. להרצה כמנהל: קליק ימני ← 'הפעל כמנהל'.",en:"Opens a terminal to run commands. As admin: right-click → 'Run as administrator'."},
+ kw:{he:["cmd","powershell","שורת פקודה","טרמינל","terminal"],en:["cmd","powershell","terminal","command prompt"]},
+ methods:[
+  {type:"run",value:"cmd",best:true,compat:Y},
+  {type:"run",value:"powershell",compat:FROM7}],
+ before:{he:"פקודות רבות דורשות הרשאת מנהל — אז פתח את הטרמינל כמנהל מלכתחילה.",en:"Many commands need admin rights — open the terminal as admin from the start."},
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sys-mstsc",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"שולחן עבודה מרוחק (Remote Desktop)",en:"Remote Desktop"},
+ desc:{he:"מתחבר למחשב אחר ושולט בו מרחוק.",en:"Connects to and controls another PC remotely."},
+ kw:{he:["mstsc","שולחן עבודה מרוחק","remote desktop","rdp"],en:["mstsc","remote desktop","rdp"]},
+ methods:[{type:"run",value:"mstsc",best:true,compat:Y}],
+ source:"https://learn.microsoft.com/windows-server/remote/remote-desktop-services/"},
+
+{id:"sys-optfeatures",cat:"system",risk:"yellow",admin:true,compat:Y,reversible:true,
+ title:{he:"תכונות Windows (הוסף/הסר)",en:"Windows features (add/remove)"},
+ desc:{he:"הפעלה/כיבוי של רכיבי Windows (למשל .NET, Hyper-V, WSL).",en:"Turn Windows components on/off (e.g. .NET, Hyper-V, WSL)."},
+ kw:{he:["תכונות windows","optionalfeatures","hyper-v","wsl",".net"],en:["windows features","optionalfeatures","hyper-v","wsl"]},
+ methods:[{type:"run",value:"optionalfeatures",best:true,compat:Y}],
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"clean-wsreset",cat:"cleanup",risk:"green",admin:false,compat:FROM8,
+ title:{he:"איפוס מטמון חנות Microsoft",en:"Reset Microsoft Store cache"},
+ desc:{he:"מנקה את מטמון החנות — פותר הרבה תקלות התקנה/עדכון של אפליקציות מהחנות.",en:"Clears the Store cache — fixes many Store app install/update issues."},
+ kw:{he:["wsreset","חנות","microsoft store","תקלות חנות"],en:["wsreset","store","microsoft store"]},
+ methods:[{type:"run",value:"wsreset",best:true,compat:FROM8}],
+ expectedOk:{he:"חלון שחור נפתח לרגע ואז החנות נפתחת — סימן שהמטמון נוקה.",en:"A black window opens briefly, then the Store opens — the cache is cleared."},
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"clean-localappdata",cat:"cleanup",risk:"green",admin:false,compat:FROM7,
+ title:{he:"נתוני אפליקציות מקומיים (LocalAppData)",en:"Local app data (LocalAppData)"},
+ desc:{he:"פותח את תיקיית הנתונים של אפליקציות — מטמונים שלפעמים תופסים הרבה מקום.",en:"Opens the app data folder — caches that sometimes take a lot of space."},
+ kw:{he:["localappdata","נתוני אפליקציה","מטמון","מקום"],en:["localappdata","app data","cache"]},
+ methods:[{type:"run",value:"%localappdata%",best:true,compat:FROM7}],
+ before:{he:"אל תמחק תיקיות של אפליקציות שרצות כרגע. במקרה של ספק — אל תמחק.",en:"Don't delete folders of apps that are running. When in doubt — don't."},
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sec-uac",cat:"security",risk:"yellow",admin:false,compat:FROM7,
+ title:{he:"בקרת חשבון משתמש (UAC)",en:"User Account Control (UAC)"},
+ desc:{he:"קובע מתי Windows מבקש אישור לפעולות מנהל. השארה גבוהה = יותר בטוח.",en:"Controls when Windows asks to confirm admin actions. Higher = safer."},
+ kw:{he:["uac","בקרת חשבון","אישור מנהל","התראות"],en:["uac","user account control","admin prompt"]},
+ methods:[{type:"run",value:"useraccountcontrolsettings",best:true,compat:FROM7}],
+ before:{he:"הורדת UAC לגמרי מסירה שכבת הגנה חשובה. מומלץ להשאיר לפחות ברמת ברירת המחדל.",en:"Turning UAC off entirely removes an important safety layer. Keep it at least at the default level."},
+ source:"https://learn.microsoft.com/windows/security/"},
+
+{id:"sc-project",cat:"shortcuts",risk:"green",admin:false,compat:FROM7,
+ title:{he:"מסך שני / מקרן",en:"Second screen / projector"},
+ desc:{he:"בוחר איך להשתמש במסך נוסף: שכפול, הרחבה או מסך יחיד.",en:"Choose how to use a second display: duplicate, extend or single."},
+ kw:{he:["מסך שני","מקרן","win p","projector","שכפול מסך"],en:["second screen","projector","win p","duplicate"]},
+ methods:[{type:"shortcut",value:"Win + P",best:true,compat:FROM7}]},
+{id:"sc-vdswitch",cat:"shortcuts",risk:"green",admin:false,compat:FROM10,
+ title:{he:"מעבר בין שולחנות עבודה",en:"Switch virtual desktops"},
+ desc:{he:"עובר בין שולחנות העבודה הווירטואליים בלי לפתוח תצוגת משימות.",en:"Move between virtual desktops without opening Task View."},
+ kw:{he:["שולחן עבודה","מעבר","win ctrl חץ","virtual desktop"],en:["virtual desktop","switch","win ctrl arrow"]},
+ methods:[{type:"shortcut",value:"Win + Ctrl + ← / →",best:true,compat:FROM10}]},
+{id:"sc-winnum",cat:"shortcuts",risk:"green",admin:false,compat:FROM7,
+ title:{he:"הפעלת תוכנה מהשורת משימות",en:"Launch a taskbar app"},
+ desc:{he:"Win + מספר מפעיל את התוכנה במיקום הזה בשורת המשימות (1 = הראשונה).",en:"Win + number launches the app at that taskbar position (1 = first)."},
+ kw:{he:["win מספר","שורת משימות","הפעלה מהירה"],en:["win number","taskbar","quick launch"]},
+ methods:[{type:"shortcut",value:"Win + 1…9",best:true,compat:FROM7}]}
+);
+
 /* ============================ TROUBLESHOOT TREES ============================ */
 const TREES=[
+ {id:"t-sound",cat:"troubleshoot",em:"🔇",
+  title:{he:"אין קול",en:"No sound"},
+  intro:{he:"נבדוק מהפשוט למורכב: מכשיר הפלט → פותר בעיות → שירות השמע → דרייבר.",en:"From simple to complex: output device → troubleshooter → audio service → driver."},
+  steps:[
+   {do:{he:"ודא שמכשיר הפלט הנכון נבחר ולא מושתק.",en:"Make sure the right output device is selected and not muted."},cmd:"mmsys.cpl",
+    check:{he:"בחר את הרמקולים/אוזניות הנכונים כ'ברירת מחדל', וודא שהעוצמה למעלה. לפעמים הקול פשוט יוצא למכשיר אחר.",en:"Set the right speakers/headphones as 'Default' and check volume is up. Sometimes sound just goes to another device."}},
+   {do:{he:"הפעל את פותר הבעיות של הקול.",en:"Run the sound troubleshooter."},
+    check:{he:"הגדרות ← מערכת ← קול ← פתרון בעיות. הוא מזהה ומתקן הרבה תקלות שמע לבד.",en:"Settings → System → Sound → Troubleshoot. It detects and fixes many audio issues on its own."}},
+   {do:{he:"אתחל את שירות השמע.",en:"Restart the audio service."},cmd:"net stop audiosrv && net start audiosrv",
+    check:{he:"דורש טרמינל כמנהל. אם הקול חזר — זה היה השירות. אם לא — המשך לדרייבר.",en:"Needs an admin terminal. If sound returns — it was the service. If not — check the driver."}},
+   {do:{he:"בדוק את דרייבר השמע.",en:"Check the audio driver."},cmd:"devmgmt.msc",
+    check:{he:"תחת 'בקרי סאונד, וידאו ומשחקים' — סימן קריאה צהוב = בעיית דרייבר. קליק ימני ← עדכן מנהל התקן.",en:"Under 'Sound, video and game controllers' — a yellow mark = driver issue. Right-click → Update driver."}},
+  ]},
+ {id:"t-printer",cat:"troubleshoot",em:"🖨️",
+  title:{he:"המדפסת לא עובדת",en:"Printer isn't working"},
+  intro:{he:"רוב תקלות ההדפסה נפתרות בתור ההדפסה או בשירות ה-Spooler.",en:"Most printing issues are solved in the print queue or the Spooler service."},
+  steps:[
+   {do:{he:"בדוק חיבור, ונסה לכבות ולהדליק את המדפסת.",en:"Check the connection, and power-cycle the printer."},
+    check:{he:"כבל/רשת מחוברים? כיבוי-הדלקה של המדפסת פותר הפתעות רבות.",en:"Cable/network connected? Power-cycling the printer clears many surprises."}},
+   {do:{he:"נקה עבודות תקועות מתור ההדפסה.",en:"Clear stuck jobs from the print queue."},cmd:"control printers",
+    check:{he:"פתח את המדפסת, ומחק מסמכים תקועים מהתור. עבודה תקועה חוסמת את כל השאר.",en:"Open the printer and delete stuck documents. One stuck job blocks all the rest."}},
+   {do:{he:"אתחל את שירות ההדפסה (Spooler).",en:"Restart the print service (Spooler)."},cmd:"net stop spooler && net start spooler",
+    check:{he:"דורש טרמינל כמנהל. מנקה תור תקוע ומאתחל את מנגנון ההדפסה.",en:"Needs an admin terminal. Clears a jammed queue and resets the print engine."}},
+   {do:{he:"הפעל את פותר הבעיות של המדפסת.",en:"Run the printer troubleshooter."},
+    check:{he:"הגדרות ← מערכת ← פתרון בעיות ← מדפסת. מזהה ומתקן בעיות נפוצות אוטומטית.",en:"Settings → System → Troubleshoot → Printer. Detects and fixes common issues automatically."}},
+  ]},
  {id:"t-net",cat:"troubleshoot",em:"🌐",
   title:{he:"האינטרנט לא עובד",en:"Internet isn't working"},
   intro:{he:"נעבור מהקרוב לרחוק: המחשב → הרשת המקומית → האינטרנט → DNS.",en:"We'll go outward: PC → local network → internet → DNS."},
@@ -856,6 +972,7 @@ function render(screen,param){
   if(screen==='item')return renderItem(c,param);
   if(screen==='tree')return renderTree(c,param);
   if(screen==='favs')return renderFavs(c);
+  if(screen==='settings')return renderSettings(c);
   if(screen==='about')return renderAbout(c);
 }
 function updateChip(){const chip=document.getElementById('pcChip');
@@ -1054,6 +1171,145 @@ function renderFavs(c){
   list.forEach(it=>c.appendChild(itemRow(it)));
 }
 
+/* ============================ AI (BYOK) + SETTINGS ============================ */
+const AI_PROVIDERS=[
+ {id:"gemini",label:{he:"Gemini",en:"Gemini"},tag:"FREE",help:{he:"Google Gemini — יש שכבה חינמית ללא כרטיס אשראי.",en:"Google Gemini — free tier, no credit card needed."},link:"https://aistudio.google.com/app/apikey",linkTxt:{he:"קבל מפתח חינם ↗",en:"Get a free key ↗"},fields:[{k:"gemini",ph:"AIza…",secret:true,label:{he:"מפתח API",en:"API key"}}]},
+ {id:"claude",label:{he:"Claude",en:"Claude"},tag:"API",help:{he:"Anthropic Claude — מדויק מאוד. בתשלום לפי שימוש.",en:"Anthropic Claude — very accurate. Pay per use."},link:"https://console.anthropic.com",linkTxt:{he:"קבל מפתח ↗",en:"Get a key ↗"},fields:[{k:"claude",ph:"sk-ant-…",secret:true,label:{he:"מפתח API",en:"API key"}}]},
+ {id:"openai",label:{he:"ChatGPT",en:"ChatGPT"},tag:"API",help:{he:"OpenAI — בתשלום לפי שימוש.",en:"OpenAI — pay per use."},link:"https://platform.openai.com/api-keys",linkTxt:{he:"קבל מפתח ↗",en:"Get a key ↗"},fields:[{k:"openai",ph:"sk-…",secret:true,label:{he:"מפתח API",en:"API key"}}]},
+ {id:"device",label:{he:"מקומי",en:"Local"},tag:"LOCAL",help:{he:"AI על המחשב שלך (Ollama / LM Studio) — פרטי, ללא עלות, בלי מפתח.",en:"On-device AI (Ollama / LM Studio) — private, free, no key."},link:"https://ollama.com",linkTxt:{he:"אודות Ollama ↗",en:"About Ollama ↗"},fields:[{k:"deviceUrl",ph:"http://localhost:11434/v1",secret:false,label:{he:"כתובת השרת המקומי",en:"Local server URL"}}]},
+ {id:"custom",label:{he:"מותאם",en:"Custom"},tag:"API",help:{he:"כל endpoint תואם-OpenAI + מפתח אופציונלי.",en:"Any OpenAI-compatible endpoint + optional key."},link:"",linkTxt:{he:"",en:""},fields:[{k:"customUrl",ph:"https://…/v1/chat/completions",secret:false,label:{he:"כתובת ה-endpoint",en:"Endpoint URL"}},{k:"customKey",ph:"(אופציונלי)",secret:true,label:{he:"מפתח (אופציונלי)",en:"Key (optional)"}}]},
+];
+function getAI(){try{return JSON.parse(store.get('pcg_ai')||'null');}catch(e){return null;}}
+function setAI(o){store.set('pcg_ai',JSON.stringify(o));}
+function aiFirstKey(s){return (s||'').split(/[\n,;]+/).map(x=>x.trim()).filter(Boolean)[0]||'';}
+
+let aiSel=null; // provider id currently shown in settings
+async function aiTest(provider,keys,statusEl){
+  const set=(txt,color)=>{if(statusEl){statusEl.textContent=txt;statusEl.style.color=color;}};
+  set(P.uiLang==='he'?'בודק…':'Testing…','var(--muted)');
+  try{
+    let ok=false;
+    if(provider==='gemini'){
+      const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?key='+encodeURIComponent(aiFirstKey(keys.gemini)));
+      ok=r.ok;
+    }else if(provider==='claude'){
+      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':aiFirstKey(keys.claude),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1,messages:[{role:'user',content:'hi'}]})});
+      ok=r.ok;
+    }else if(provider==='openai'){
+      const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':'Bearer '+aiFirstKey(keys.openai)}});
+      ok=r.ok;
+    }else if(provider==='device'){
+      const base=(keys.deviceUrl||'').replace(/\/+$/,'');
+      const r=await fetch(base+'/models').catch(()=>fetch(base));
+      ok=r&&r.ok;
+    }else if(provider==='custom'){
+      const h={'Content-Type':'application/json'};if(aiFirstKey(keys.customKey))h['Authorization']='Bearer '+aiFirstKey(keys.customKey);
+      const r=await fetch(keys.customUrl,{method:'POST',headers:h,body:JSON.stringify({model:'gpt-4o-mini',max_tokens:1,messages:[{role:'user',content:'hi'}]})});
+      ok=r.ok;
+    }
+    if(ok)set(P.uiLang==='he'?'✓ החיבור עובד':'✓ Connection works','var(--green)');
+    else set(P.uiLang==='he'?'✗ החיבור נכשל — בדוק את המפתח/הכתובת':'✗ Failed — check the key/URL','var(--red)');
+  }catch(e){
+    set((P.uiLang==='he'?'✗ שגיאה: ':'✗ Error: ')+(e.message||e),'var(--red)');
+  }
+}
+
+function renderSettings(c){
+  const he=P.uiLang==='he';
+  c.appendChild(backBtn());
+  const h=el('div','hero');h.innerHTML=`<h1>⚙️ ${he?'הגדרות':'Settings'}</h1>`;c.appendChild(h);
+
+  /* ---- AI connection ---- */
+  const saved=getAI()||{provider:null,keys:{}};
+  if(aiSel===null)aiSel=saved.provider||'gemini';
+  const connectedNote=saved.provider?`<span style="color:var(--green);font-size:13px">● ${he?'מחובר':'Connected'}: ${esc(L(AI_PROVIDERS.find(x=>x.id===saved.provider).label))}</span>`:`<span style="color:var(--muted);font-size:13px">${he?'לא מחובר — האפליקציה עובדת גם בלי זה':'Not connected — the app works without it'}</span>`;
+  const sec=el('div','detail');
+  sec.innerHTML=`<h2 style="font-size:19px">🤖 ${he?'עוזר חכם (אופציונלי)':'Smart assistant (optional)'}</h2>
+    <p class="sub">${he?'חבר מפתח AI משלך כדי לשאול את העוזר "יש לי בעיה X — מה לבדוק?". המפתח נשמר על המכשיר בלבד ונשלח ישירות לספק שבחרת.':'Connect your own AI key to ask the assistant "I have problem X — what should I check?". The key is stored on-device only and sent straight to your chosen provider.'}</p>
+    <div style="margin:6px 0 14px">${connectedNote}</div>
+    <div class="choices" id="aiPills"></div>
+    <div id="aiPanel"></div>`;
+  c.appendChild(sec);
+  const pills=sec.querySelector('#aiPills');
+  AI_PROVIDERS.forEach(pr=>{
+    const b=el('button','choice'+(pr.id===aiSel?' sel':''));
+    b.innerHTML=`${esc(L(pr.label))} <span style="font-size:10px;opacity:.8;border:1px solid currentColor;border-radius:6px;padding:0 4px;margin-inline-start:4px">${pr.tag}</span>`;
+    b.onclick=()=>{aiSel=pr.id;renderSettings(c);};
+    pills.appendChild(b);
+  });
+  const pr=AI_PROVIDERS.find(x=>x.id===aiSel);
+  const panel=sec.querySelector('#aiPanel');
+  const keys=(saved.keys)||{};
+  let fieldsHtml=pr.fields.map(f=>`<div style="margin-top:12px">
+     <div style="font-size:13px;color:var(--muted);margin-bottom:5px">${esc(L(f.label))}</div>
+     <div style="display:flex;gap:8px">
+       <input id="ai_${f.k}" ${f.secret?'type="password"':'type="text"'} placeholder="${esc(f.ph)}" value="${esc(keys[f.k]||(f.k==='deviceUrl'?'http://localhost:11434/v1':''))}" style="flex:1;padding:11px 13px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit" autocomplete="off">
+       ${f.secret?`<button class="btn" onclick="const i=document.getElementById('ai_${f.k}');i.type=i.type==='password'?'text':'password'">👁</button>`:''}
+     </div></div>`).join('');
+  panel.innerHTML=`<div class="warnbox txt" style="margin-top:14px">${esc(L(pr.help))}</div>
+    ${pr.link?`<div style="margin-top:8px"><a class="src" href="${esc(pr.link)}" target="_blank" rel="noopener">🔗 ${esc(L(pr.linkTxt))}</a></div>`:''}
+    ${fieldsHtml}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+      <button class="btn primary" id="aiSave">${he?'שמור וחבר':'Save & connect'}</button>
+      <button class="btn" id="aiTest">${he?'בדוק חיבור':'Test connection'}</button>
+      ${saved.provider?`<button class="btn ghost" id="aiDisc">${he?'נתק':'Disconnect'}</button>`:''}
+    </div>
+    <div id="aiStatus" style="margin-top:10px;font-size:14px;min-height:18px"></div>
+    <div style="margin-top:10px;font-size:12px;color:var(--muted)">🔒 ${he?'פיצ׳רי הבינה שולחים את הטקסט של השאלה לספק שבחרת. הכל שאר נשאר על המכשיר.':'AI features send your question text to the chosen provider. Everything else stays on-device.'}</div>`;
+
+  const readKeys=()=>{const o=Object.assign({},keys);pr.fields.forEach(f=>{const i=document.getElementById('ai_'+f.k);if(i)o[f.k]=i.value.trim();});return o;};
+  panel.querySelector('#aiSave').onclick=()=>{
+    const nk=readKeys();setAI({provider:aiSel,keys:nk});
+    const st=document.getElementById('aiStatus');st.textContent=he?'נשמר ✓':'Saved ✓';st.style.color='var(--green)';
+    renderSettings(c);
+  };
+  panel.querySelector('#aiTest').onclick=()=>aiTest(aiSel,readKeys(),document.getElementById('aiStatus'));
+  const disc=panel.querySelector('#aiDisc');if(disc)disc.onclick=()=>{store.del('pcg_ai');aiSel=null;renderSettings(c);};
+
+  /* ---- Backup / restore ---- */
+  const bk=el('div','detail');bk.style.marginTop='14px';
+  bk.innerHTML=`<h2 style="font-size:19px">💾 ${he?'גיבוי ושחזור':'Backup & restore'}</h2>
+    <p class="sub">${he?'שומר את ההעדפות שלך ואת המועדפים לקובץ שאפשר לטעון במכשיר אחר.':'Saves your preferences and favorites to a file you can load on another device.'}</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" id="bkExport">⬇️ ${he?'ייצוא גיבוי':'Export backup'}</button>
+      <button class="btn" id="bkImport">⬆️ ${he?'ייבוא גיבוי':'Import backup'}</button>
+    </div>`;
+  c.appendChild(bk);
+  bk.querySelector('#bkExport').onclick=()=>{
+    const data={app:"pcguide",version:APP_VERSION,exported:new Date().toISOString(),profile:P,theme:store.get('pcg_theme')||'gold',favs:favs()};
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const a=el('a');a.href=URL.createObjectURL(blob);a.download='pcguide-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  };
+  bk.querySelector('#bkImport').onclick=()=>{
+    const inp=el('input');inp.type='file';inp.accept='application/json,.json';
+    inp.onchange=()=>{const f=inp.files[0];if(!f)return;const r=new FileReader();
+      r.onload=()=>{try{const d=JSON.parse(r.result);
+        if(d.profile){P=Object.assign(P,d.profile);saveProfile();applyDir();}
+        if(d.theme)applyTheme(d.theme);
+        if(Array.isArray(d.favs))store.set('pcg_favs',JSON.stringify(d.favs));
+        alert(he?'הגיבוי נטען בהצלחה':'Backup loaded successfully');go('home');
+      }catch(e){alert(he?'קובץ הגיבוי לא תקין':'Invalid backup file');}};
+      r.readAsText(f);};
+    inp.click();
+  };
+
+  /* ---- Profile + danger ---- */
+  const dz=el('div','detail');dz.style.marginTop='14px';
+  dz.innerHTML=`<h2 style="font-size:19px">🖥️ ${he?'המחשב שלי':'My PC'}</h2>
+    <p class="sub">${esc(verLabel(P.winVer))} · ${P.arch==='x64'?'64-bit':'32-bit'} · ${P.sysLang==='he'?'עברית':'English'}</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+      <button class="btn" onclick="openSetup()">${he?'שנה הגדרות מחשב':'Change PC settings'}</button>
+      <button class="btn ghost" id="clearAll" style="border-color:var(--red);color:var(--red)">${he?'מחק את כל הנתונים':'Delete all data'}</button>
+    </div>`;
+  c.appendChild(dz);
+  dz.querySelector('#clearAll').onclick=()=>{
+    if(!confirm(he?'למחוק את כל ההעדפות, המועדפים והחיבורים? פעולה זו אינה הפיכה.':'Delete all preferences, favorites and connections? This cannot be undone.'))return;
+    ['pcg_profile','pcg_theme','pcg_favs','pcg_ai','pcg_setup'].forEach(k=>store.del(k));
+    P={uiLang:'he',winVer:'win11',sysLang:'he',arch:'x64'};aiSel=null;applyDir();applyTheme('gold');
+    alert(he?'הכל נמחק':'All cleared');go('home');openSetup();
+  };
+}
+
 function renderAbout(c){
   c.appendChild(backBtn());
   const d=el('div','about');
@@ -1138,6 +1394,60 @@ function openThemes(){
   </div></div>`;
 }
 
+/* ============================ APPNEST ASSISTANT MAP ============================ */
+function assistantCatalog(){
+  const byCat={};
+  ITEMS.forEach(i=>{(byCat[i.cat]=byCat[i.cat]||[]).push(i.title.he+" / "+i.title.en);});
+  return CATS.map(cat=>{
+    const list=(byCat[cat.id]||[]).slice(0,40).join("; ");
+    const trees=TREES.filter(t=>t.cat===cat.id).map(t=>t.title.he).join(", ");
+    return "• "+cat.he+": "+(list||"")+(trees?" | תקלות מודרכות: "+trees:"");
+  }).join("\n");
+}
+window.APPNEST_ASSISTANT_CONFIG={
+  appName:"מדריך המחשב",
+  appDescription:[
+    "האפליקציה היא מדריך לימודי לפקודות Windows, קיצורי מקשים, פקודות CMD/PowerShell/Run ותיקון תקלות מודרך.",
+    "תפקידך: לעזור למשתמש להבין פקודות, להמליץ מה לבדוק כשיש תקלה, ולהפנות אותו למסך/קטגוריה המתאימים באפליקציה.",
+    "בטיחות (חשוב מאוד): האפליקציה רק מלמדת ומעתיקה פקודות — היא לא מריצה כלום; המשתמש מריץ ידנית ובאחריותו.",
+    "לפני פקודה מסוכנת (regedit, diskpart, format, chkdsk, מחיקת מחיצות) — הזהר במפורש מאובדן מידע, ציין שצריך הרשאת מנהל, והמלץ על גיבוי.",
+    "אל תמציא פקודות. אם אינך בטוח — אמור זאת בכנות. העדף פקודות/דרכים שמתאימות לגרסת ה-Windows של המשתמש (ראה 'פרופיל המחשב' למטה).",
+    "ענה בשפה שבה המשתמש כותב (עברית או אנגלית). היה קצר, ברור וידידותי.",
+    "אתה תוסף אופציונלי — המדריכים ועצי התקלות המובנים עובדים גם בלעדיך."
+  ].join("\n"),
+  fields:[],
+  readAiConfig:function(){ return getAI(); },
+  navigate:function(target){
+    if(!target)return;
+    if(target.indexOf('cat:')===0){ go('category',target.slice(4)); }
+    else { go(target); }
+  },
+  readState:function(){
+    let scr='home';try{scr=(stack[stack.length-1]||{}).screen||'home';}catch(e){}
+    const prof="פרופיל המחשב של המשתמש: "+verLabel(P.winVer)+" · "+(P.arch==='x64'?'64-bit':'32-bit')+" · שפת מערכת "+(P.sysLang==='he'?'עברית':'English')+".";
+    return prof+"\nהמשתמש נמצא כרגע במסך: "+scr+".\n\nהפקודות שקיימות באפליקציה (לפי קטגוריה) — המלץ מתוכן והפנה אליהן:\n"+assistantCatalog();
+  },
+  tabs:[
+    {name:"דף הבית",screen:"home"},
+    {name:"תיקון תקלות",screen:"cat:troubleshoot"},
+    {name:"רשת ואינטרנט",screen:"cat:network"},
+    {name:"מערכת ותהליכים",screen:"cat:system"},
+    {name:"דיסק ואחסון",screen:"cat:disk"},
+    {name:"ניקוי ותחזוקה",screen:"cat:cleanup"},
+    {name:"אבטחה ופרטיות",screen:"cat:security"},
+    {name:"קיצורי מקשים",screen:"cat:shortcuts"},
+    {name:"מועדפים",screen:"favs"},
+    {name:"הגדרות",screen:"settings"},
+    {name:"אודות",screen:"about"}
+  ],
+  suggestions:[
+    "האינטרנט שלי לא עובד",
+    "איך מפנים מקום בדיסק?",
+    "מה עושה הפקודה sfc /scannow?",
+    "איך פותחים את מנהל ההתקנים?"
+  ]
+};
+
 /* ============================ INIT ============================ */
 (function init(){
   loadProfile();
@@ -1154,5 +1464,6 @@ if("serviceWorker" in navigator && location.protocol.startsWith("http")){
   window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{});});
 }
 </script>
+<script src="appnest-assistant.js"></script>
 </body>
 </html>
