@@ -181,7 +181,7 @@
 const store=(()=>{let mem={};try{const k='__t';localStorage.setItem(k,'1');localStorage.removeItem(k);
   return{get:k=>localStorage.getItem(k),set:(k,v)=>localStorage.setItem(k,v),del:k=>localStorage.removeItem(k)};}
   catch(e){return{get:k=>k in mem?mem[k]:null,set:(k,v)=>mem[k]=String(v),del:k=>delete mem[k]};}})();
-const APP_VERSION="1.0.0";
+const APP_VERSION="1.1.0";
 
 /* ============================ i18n (UI) ============================ */
 const LANG={
@@ -502,6 +502,265 @@ ITEMS.push(
  methods:[{type:"run",value:"%ProgramFiles%",best:true,compat:Y}],
  archNote:{he:"במחשב 64-bit: 'Program Files' לתוכנות 64-bit ו-'Program Files (x86)' לתוכנות 32-bit. במחשב 32-bit קיימת רק 'Program Files'.",en:"On 64-bit: 'Program Files' (64-bit apps) and 'Program Files (x86)' (32-bit apps). On 32-bit there's only 'Program Files'."},
  source:"https://learn.microsoft.com/windows/"});
+
+/* ---------- BATCH 2: more commands ---------- */
+const FROMVISTA={vista:"yes",win7:"yes",win8:"yes",win81:"yes",win10:"yes",win11:"yes"};
+ITEMS.push(
+/* NETWORK */
+{id:"net-netstat",cat:"network",risk:"green",admin:false,compat:Y,
+ title:{he:"חיבורים ופורטים פתוחים",en:"Open connections & ports"},
+ desc:{he:"מציג את כל החיבורים הפעילים, הפורטים ומזהה התהליך (PID) שפתח כל אחד.",en:"Lists active connections, ports and the process (PID) behind each."},
+ kw:{he:["netstat","פורטים","חיבורים","port","pid","מי מאזין"],en:["netstat","ports","connections","listening"]},
+ methods:[{type:"cmd",value:"netstat -ano",best:true,compat:Y}],
+ expectedOk:{he:"עמודה אחרונה (PID) מקשרת לתהליך במנהל המשימות → לשונית 'פרטים'.",en:"The last column (PID) maps to a process in Task Manager → 'Details'."},
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/netstat"},
+
+{id:"net-nslookup",cat:"network",risk:"green",admin:false,compat:Y,
+ title:{he:"בדיקת שם דומיין (nslookup)",en:"DNS lookup (nslookup)"},
+ desc:{he:"בודק לאיזו כתובת IP מתורגם שם אתר — שימושי לאבחון בעיות DNS.",en:"Checks which IP a hostname resolves to — useful for DNS diagnosis."},
+ kw:{he:["nslookup","dns","דומיין","תרגום שם"],en:["nslookup","dns","resolve","domain"]},
+ methods:[{type:"cmd",value:"nslookup google.com",best:true,compat:Y}],
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/nslookup"},
+
+{id:"net-tracert",cat:"network",risk:"green",admin:false,compat:Y,
+ title:{he:"מסלול לרשת (tracert)",en:"Trace route (tracert)"},
+ desc:{he:"מראה את כל התחנות בדרך ליעד ואיפה יש עיכוב — לאיתור היכן החיבור נתקע.",en:"Shows every hop to a destination and where delay is — to find where it stalls."},
+ kw:{he:["tracert","מסלול","traceroute","איפה תקוע","hops"],en:["tracert","traceroute","hops","path"]},
+ methods:[{type:"cmd",value:"tracert google.com",best:true,compat:Y}],
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/tracert"},
+
+{id:"net-ncpa",cat:"network",risk:"yellow",admin:false,compat:Y,
+ title:{he:"מתאמי הרשת (Wi-Fi / Ethernet)",en:"Network adapters (Wi-Fi / Ethernet)"},
+ desc:{he:"חלון החיבורים: הפעלה/כיבוי של מתאם, שינוי כתובת IP ו-DNS ידנית.",en:"The connections window: enable/disable an adapter, set IP & DNS manually."},
+ kw:{he:["ncpa","מתאם","wifi","ethernet","חיבור רשת","כתובת קבועה"],en:["ncpa","adapter","wifi","ethernet","static ip"]},
+ methods:[{type:"run",value:"ncpa.cpl",best:true,compat:Y}],
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"net-renew",cat:"network",risk:"yellow",admin:true,compat:Y,reversible:false,
+ title:{he:"חידוש כתובת IP",en:"Renew IP address"},
+ desc:{he:"משחרר את הכתובת הנוכחית ומבקש חדשה מהראוטר — עוזר כשאין חיבור למרות ש-Wi-Fi מחובר.",en:"Releases the current address and asks the router for a new one — helps when Wi-Fi connects but has no internet."},
+ kw:{he:["release","renew","חידוש ip","כתובת חדשה","אין חיבור"],en:["release","renew","new ip"]},
+ methods:[{type:"cmd",value:"ipconfig /release && ipconfig /renew",best:true,compat:Y}],
+ before:{he:"החיבור יינתק לרגע בזמן הפעולה.",en:"The connection drops briefly during the operation."},
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/ipconfig"},
+
+/* SYSTEM */
+{id:"sys-control",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"לוח הבקרה (Control Panel)",en:"Control Panel"},
+ desc:{he:"פותח את לוח הבקרה הקלאסי — עדיין המקום להרבה הגדרות שלא עברו ל'הגדרות'.",en:"Opens the classic Control Panel — still home to many settings not moved to 'Settings'."},
+ kw:{he:["לוח בקרה","control panel","הגדרות ישנות"],en:["control panel","classic settings"]},
+ methods:[{type:"run",value:"control",best:true,compat:Y}],
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sys-appwiz",cat:"system",risk:"yellow",admin:false,compat:Y,
+ title:{he:"הסרת תוכנות",en:"Uninstall programs"},
+ desc:{he:"רשימת התוכנות המותקנות — להסרה או שינוי.",en:"The installed-programs list — to uninstall or change."},
+ kw:{he:["הסרה","להסיר תוכנה","appwiz","uninstall","תוכנות מותקנות"],en:["uninstall","remove program","appwiz","programs and features"]},
+ methods:[{type:"run",value:"appwiz.cpl",best:true,compat:Y}],
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sys-sysdm",cat:"system",risk:"yellow",admin:false,compat:Y,
+ title:{he:"מאפייני מערכת",en:"System Properties"},
+ desc:{he:"שם המחשב, חומרה, הגנת מערכת (נקודות שחזור) והגדרות ביצועים מתקדמות.",en:"Computer name, hardware, System Protection (restore points) and advanced performance settings."},
+ kw:{he:["מאפייני מערכת","sysdm","שם מחשב","נקודת שחזור","משתני סביבה","ביצועים"],en:["system properties","sysdm","restore point","environment variables","performance"]},
+ methods:[{type:"run",value:"sysdm.cpl",best:true,compat:Y}],
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sys-regedit",cat:"system",risk:"red",admin:true,compat:Y,reversible:true,
+ title:{he:"עורך הרישום (Registry Editor)",en:"Registry Editor"},
+ desc:{he:"מסד ההגדרות המרכזי של Windows. כלי עוצמתי — וגם המקום הכי קל לשבור בו את המערכת.",en:"Windows' central settings database. Powerful — and the easiest place to break the system."},
+ kw:{he:["regedit","רישום","registry","מפתחות","עריכת רישום"],en:["regedit","registry","keys","hive"]},
+ methods:[{type:"run",value:"regedit",best:true,compat:Y}],
+ before:{he:"עריכה שגויה עלולה לשבש את המערכת עד כדי מניעת עלייה. אל תיגע במפתחות שאינך מבין. לפני שינוי: קובץ ← ייצוא, כדי לשמור גיבוי של המפתח.",en:"A wrong edit can corrupt Windows to the point it won't boot. Don't touch keys you don't understand. Before changing: File → Export to back up the key."},
+ archNote:{he:"במחשב 64-bit, גרסאות 32-bit של מפתחות יושבות תחת HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node.",en:"On 64-bit, 32-bit versions of keys live under HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node."},
+ undo:{he:"אם ייצאת קובץ .reg — לחיצה כפולה עליו משחזרת את המפתח. אחרת — שחזר דרך נקודת שחזור מערכת.",en:"If you exported a .reg file — double-click it to restore. Otherwise — use a System Restore point."},
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sys-eventvwr",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"מציג האירועים (Event Viewer)",en:"Event Viewer"},
+ desc:{he:"יומני המערכת: שגיאות, אזהרות וקריסות. שימושי לאבחון 'מה קרה כשזה נפל'.",en:"System logs: errors, warnings and crashes. Great for 'what happened when it crashed'."},
+ kw:{he:["eventvwr","יומן אירועים","שגיאות","לוג","קריסה","event log"],en:["event viewer","logs","errors","crash","event log"]},
+ methods:[{type:"run",value:"eventvwr.msc",best:true,compat:Y}],
+ expectedOk:{he:"התחל ב'יומני Windows ← מערכת', וחפש שגיאות (אדום) סביב הזמן שהתקלה קרתה.",en:"Start at 'Windows Logs → System' and look for errors (red) around when the issue happened."},
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sys-dxdiag",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"אבחון DirectX (dxdiag)",en:"DirectX diagnostics (dxdiag)"},
+ desc:{he:"מציג פרטי כרטיס מסך, סאונד, זיכרון ודרייברים — נוח לבדיקות גיימינג/גרפיקה.",en:"Shows GPU, sound, memory and driver details — handy for gaming/graphics checks."},
+ kw:{he:["dxdiag","directx","כרטיס מסך","gpu","דרייבר גרפי"],en:["dxdiag","directx","gpu","graphics"]},
+ methods:[{type:"run",value:"dxdiag",best:true,compat:Y}],
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sys-resmon",cat:"system",risk:"green",admin:false,compat:FROMVISTA,
+ title:{he:"צג המשאבים (Resource Monitor)",en:"Resource Monitor"},
+ desc:{he:"פירוט חי ומעמיק של מעבד, דיסק, רשת וזיכרון — למי שאוכל את המשאבים.",en:"Live, deep breakdown of CPU, disk, network and memory — who's eating resources."},
+ kw:{he:["resmon","משאבים","דיסק 100%","מה אוכל זיכרון","ביצועים"],en:["resmon","resources","disk 100%","memory hog"]},
+ methods:[{type:"run",value:"resmon",best:true,compat:FROMVISTA}],
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sys-taskschd",cat:"system",risk:"yellow",admin:false,compat:FROMVISTA,
+ title:{he:"מתזמן המשימות",en:"Task Scheduler"},
+ desc:{he:"רואה ומנהל משימות שרצות אוטומטית בזמנים/אירועים — כולל כאלה שתוכנות מוסיפות.",en:"View and manage tasks that run automatically on times/events — including ones apps add."},
+ kw:{he:["taskschd","מתזמן","משימות מתוזמנות","אוטומציה","startup"],en:["task scheduler","scheduled tasks","automation"]},
+ methods:[{type:"run",value:"taskschd.msc",best:true,compat:FROMVISTA}],
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sys-compmgmt",cat:"system",risk:"yellow",admin:true,compat:Y,
+ title:{he:"ניהול המחשב",en:"Computer Management"},
+ desc:{he:"מרכז כלים אחד: ניהול דיסקים, שירותים, מציג אירועים, משתמשים ועוד.",en:"One hub: disk management, services, event viewer, users and more."},
+ kw:{he:["compmgmt","ניהול המחשב","כלים","משתמשים מקומיים"],en:["computer management","compmgmt","tools"]},
+ methods:[{type:"run",value:"compmgmt.msc",best:true,compat:Y}],
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sys-gpedit",cat:"system",risk:"yellow",admin:true,compat:Y,reversible:true,
+ title:{he:"עורך מדיניות קבוצתית (gpedit)",en:"Group Policy Editor (gpedit)"},
+ desc:{he:"שולט בהגדרות מערכת מתקדמות (עדכונים, אבטחה, ממשק). קיים רק ב-Pro/Enterprise.",en:"Controls advanced system policies (updates, security, UI). Pro/Enterprise only."},
+ kw:{he:["gpedit","מדיניות","group policy","הגדרות מתקדמות"],en:["gpedit","group policy","policies"]},
+ methods:[{type:"run",value:"gpedit.msc",best:true,compat:Y}],
+ before:{he:"אינו קיים ב-Windows Home — המסך פשוט לא ייפתח. שינויי מדיניות משפיעים על כל המערכת.",en:"Not present in Windows Home — the window simply won't open. Policy changes affect the whole system."},
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sys-systeminfo",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"סיכום המערכת (systeminfo)",en:"System summary (systeminfo)"},
+ desc:{he:"מדפיס סיכום טקסטואלי מלא: גרסה, זיכרון, זמן הפעלה, עדכונים מותקנים ועוד.",en:"Prints a full text summary: version, RAM, uptime, installed updates and more."},
+ kw:{he:["systeminfo","סיכום","זמן הפעלה","uptime","מפרט"],en:["systeminfo","summary","uptime","spec"]},
+ methods:[{type:"cmd",value:"systeminfo",best:true,compat:Y}],
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/systeminfo"},
+
+{id:"sys-shutdown",cat:"system",risk:"yellow",admin:false,compat:Y,reversible:true,
+ title:{he:"אתחול / כיבוי משורת פקודה",en:"Restart / shutdown from command line"},
+ desc:{he:"מאתחל (/r) או מכבה (/s) את המחשב מיד. שימושי בסקריפטים או בשליטה מרחוק.",en:"Restarts (/r) or shuts down (/s) immediately. Useful in scripts or remote control."},
+ kw:{he:["shutdown","אתחול","כיבוי","restart","reboot"],en:["shutdown","restart","reboot"]},
+ methods:[
+  {type:"cmd",value:"shutdown /r /t 0",best:true,compat:Y},
+  {type:"cmd",value:"shutdown /s /t 0",compat:Y}],
+ before:{he:"סוגר את כל התוכנות מיד — שמור עבודה פתוחה קודם. /t 0 = מיד; אפשר לשים מספר שניות אחר.",en:"Closes all apps immediately — save open work first. /t 0 = now; you can set other seconds."},
+ undo:{he:"לביטול כיבוי/אתחול מתוזמן: shutdown /a",en:"To cancel a scheduled shutdown/restart: shutdown /a"},
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/shutdown"},
+
+{id:"sys-battery",cat:"system",risk:"green",admin:false,compat:FROM8,
+ title:{he:"דוח בריאות סוללה (לפטופ)",en:"Battery health report (laptop)"},
+ desc:{he:"יוצר קובץ HTML עם קיבולת הסוללה המקורית מול הנוכחית — כמה בלאי נצבר.",en:"Creates an HTML file comparing the battery's original vs current capacity — how much wear."},
+ kw:{he:["סוללה","battery","בריאות סוללה","powercfg","בלאי"],en:["battery","health","powercfg","wear"]},
+ methods:[{type:"cmd",value:"powercfg /batteryreport",best:true,compat:FROM8}],
+ expectedOk:{he:"נוצר battery-report.html בתיקיית המשתמש. פתח אותו והשווה 'Design Capacity' ל-'Full Charge Capacity'.",en:"Creates battery-report.html in your user folder. Open it and compare 'Design Capacity' to 'Full Charge Capacity'."},
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/powercfg"},
+
+/* DISK */
+{id:"disk-defrag",cat:"disk",risk:"yellow",admin:true,compat:FROM7,
+ title:{he:"איחוי / אופטימיזציה של הכונן",en:"Optimize / defragment the drive"},
+ desc:{he:"מסדר קבצים בכונן. ב-SSD זה מריץ TRIM (לא איחוי) — בטוח ומומלץ מדי פעם.",en:"Reorganizes files. On SSD it runs TRIM (not defrag) — safe and worth doing occasionally."},
+ kw:{he:["איחוי","defrag","אופטימיזציה","trim","ssd","דיסק איטי"],en:["defrag","optimize","trim","ssd"]},
+ methods:[
+  {type:"run",value:"dfrgui",best:true,compat:FROM7},
+  {type:"cmd",value:"defrag C: /O",compat:FROM8}],
+ before:{he:"אין צורך לאחות SSD ידנית לעתים קרובות — Windows מריץ TRIM לבד. איחוי כונן מכני עלול לקחת זמן רב.",en:"No need to manually defrag an SSD often — Windows runs TRIM itself. Defragging an HDD can take a while."},
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/defrag"},
+
+{id:"disk-health",cat:"disk",risk:"green",admin:true,compat:FROM8,
+ title:{he:"בריאות הדיסק הפיזי",en:"Physical disk health"},
+ desc:{he:"מציג את מצב הבריאות של כל דיסק (Healthy / Warning / Unhealthy) לפי חיישני S.M.A.R.T.",en:"Shows each disk's health status (Healthy / Warning / Unhealthy) via S.M.A.R.T."},
+ kw:{he:["בריאות דיסק","smart","דיסק גוסס","get-physicaldisk","דיסק פגום"],en:["disk health","smart","failing drive","get-physicaldisk"]},
+ methods:[{type:"powershell",value:"Get-PhysicalDisk | Select FriendlyName, MediaType, HealthStatus",best:true,compat:FROM8}],
+ expectedOk:{he:"HealthStatus = Healthy תקין. Warning/Unhealthy = גבה מיד את המידע ושקול החלפת דיסק.",en:"HealthStatus = Healthy is fine. Warning/Unhealthy = back up now and consider replacing the disk."},
+ source:"https://learn.microsoft.com/powershell/module/storage/get-physicaldisk"},
+
+{id:"disk-diskpart",cat:"disk",risk:"red",admin:true,compat:Y,reversible:false,
+ title:{he:"ניהול דיסקים משורת פקודה (diskpart)",en:"Disk partitioning CLI (diskpart)"},
+ desc:{he:"כלי חזק לניהול דיסקים ומחיצות משורת הפקודה — כולל פרמוט וניקוי מלא.",en:"A powerful CLI for disks and partitions — including format and full wipe."},
+ kw:{he:["diskpart","מחיצות","פרמוט","clean","ניקוי דיסק","דיסק און קי"],en:["diskpart","partition","format","clean","usb"]},
+ methods:[{type:"cmd",value:"diskpart",best:true,compat:Y}],
+ before:{he:"פקודה אחת (clean) מוחקת דיסק שלם לצמיתות. תמיד הרץ 'list disk' ואז 'select disk' וּודא היטב את המספר לפני כל פעולה — טעות כאן מוחקת הכל.",en:"One command (clean) permanently wipes a whole disk. Always run 'list disk' then 'select disk' and double-check the number before anything — a mistake here erases everything."},
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/diskpart"},
+
+/* CLEANUP */
+{id:"clean-winold",cat:"cleanup",risk:"yellow",admin:false,compat:FROM10,
+ title:{he:"מחיקת Windows קודם (Windows.old)",en:"Remove previous Windows (Windows.old)"},
+ desc:{he:"אחרי שדרוג גרסה, עותק של המערכת הישנה נשמר ותופס 20–40GB. אפשר למחוק אם הכל עובד.",en:"After a version upgrade, a copy of the old system stays and eats 20–40GB. Safe to remove if all works."},
+ kw:{he:["windows.old","מקום","שדרוג","התקנה קודמת","עדכון גרסה"],en:["windows.old","space","previous installation","upgrade"]},
+ methods:[{type:"gui",paths:{
+    win10:{he:"הגדרות ← מערכת ← אחסון ← קבצים זמניים ← סמן 'Previous Windows installations' ← הסר קבצים",en:"Settings → System → Storage → Temporary files → tick 'Previous Windows installations' → Remove files"},
+    win11:{he:"הגדרות ← מערכת ← אחסון ← קבצים זמניים ← סמן 'Previous Windows installations' ← הסר קבצים",en:"Settings → System → Storage → Temporary files → tick 'Previous Windows installations' → Remove files"}},compat:FROM10}],
+ before:{he:"אחרי המחיקה אין דרך לחזור לגרסה הקודמת. חכה יומיים-שלושה אחרי שדרוג וודא שהכל (מדפסת, Wi-Fi, דרייברים) עובד לפני שמוחקים.",en:"After removal there's no going back to the previous version. Wait a couple of days after upgrading and confirm everything (printer, Wi-Fi, drivers) works first."},
+ source:"https://learn.microsoft.com/windows/"},
+
+/* SECURITY */
+{id:"sec-firewall",cat:"security",risk:"yellow",admin:true,compat:Y,reversible:true,
+ title:{he:"חומת אש (Firewall)",en:"Firewall"},
+ desc:{he:"שולט אילו תוכנות מורשות לתקשר ברשת. wf.msc הוא הממשק המתקדם עם כללים.",en:"Controls which apps may talk over the network. wf.msc is the advanced, rules-based UI."},
+ kw:{he:["חומת אש","firewall","חסימת תוכנה","כללים","wf.msc"],en:["firewall","block app","rules","wf.msc"]},
+ methods:[
+  {type:"run",value:"wf.msc",best:true,compat:FROMVISTA},
+  {type:"run",value:"firewall.cpl",compat:Y}],
+ before:{he:"כיבוי חומת האש חושף את המחשב. שנה כללים רק אם אתה יודע מה אתה חוסם.",en:"Turning the firewall off exposes the PC. Change rules only if you know what you're blocking."},
+ source:"https://learn.microsoft.com/windows/security/"},
+
+{id:"sec-netplwiz",cat:"security",risk:"yellow",admin:true,compat:Y,
+ title:{he:"חשבונות משתמשים (netplwiz)",en:"User accounts (netplwiz)"},
+ desc:{he:"ניהול משתמשים והרשאות; כאן גם מגדירים כניסה אוטומטית ללא סיסמה.",en:"Manage users and rights; also where you set passwordless auto sign-in."},
+ kw:{he:["netplwiz","משתמשים","כניסה אוטומטית","סיסמה","הרשאות"],en:["netplwiz","users","auto login","password"]},
+ methods:[{type:"run",value:"netplwiz",best:true,compat:Y}],
+ before:{he:"כניסה אוטומטית נוחה אך מפחיתה אבטחה — כל מי שמדליק את המחשב נכנס.",en:"Auto sign-in is convenient but lowers security — anyone who powers on the PC is logged in."},
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sec-bitlocker",cat:"security",risk:"green",admin:true,compat:FROM7,
+ title:{he:"סטטוס הצפנת BitLocker",en:"BitLocker encryption status"},
+ desc:{he:"מציג אם הכוננים מוצפנים ומה מצב ההצפנה.",en:"Shows whether drives are encrypted and the encryption state."},
+ kw:{he:["bitlocker","הצפנה","encryption","manage-bde"],en:["bitlocker","encryption","manage-bde"]},
+ methods:[{type:"cmd",value:"manage-bde -status",best:true,compat:FROM7}],
+ before:{he:"BitLocker זמין ב-Pro/Enterprise (וב-Home כ'הצפנת התקן' מוגבלת). שמור את מפתח השחזור במקום בטוח.",en:"BitLocker is on Pro/Enterprise (Home has limited 'Device Encryption'). Keep your recovery key somewhere safe."},
+ source:"https://learn.microsoft.com/windows/security/"},
+
+{id:"sec-quickscan",cat:"security",risk:"green",admin:false,compat:FROM10,
+ title:{he:"סריקת וירוסים מהירה (פקודה)",en:"Quick virus scan (command)"},
+ desc:{he:"מפעיל סריקה מהירה של Defender ישירות מ-PowerShell, בלי לפתוח ממשק.",en:"Runs a Defender quick scan straight from PowerShell, no UI needed."},
+ kw:{he:["סריקה מהירה","defender","start-mpscan","וירוס"],en:["quick scan","defender","start-mpscan","virus"]},
+ methods:[{type:"powershell",value:"Start-MpScan -ScanType QuickScan",best:true,compat:FROM10}],
+ source:"https://learn.microsoft.com/powershell/module/defender/start-mpscan"},
+
+/* SHORTCUTS */
+{id:"sc-alttab",cat:"shortcuts",risk:"green",admin:false,compat:Y,
+ title:{he:"מעבר בין חלונות",en:"Switch windows"},
+ desc:{he:"מחזיק Alt ולוחץ Tab עובר בין כל החלונות הפתוחים.",en:"Hold Alt and tap Tab to cycle all open windows."},
+ kw:{he:["alt tab","מעבר חלונות","חלונות פתוחים"],en:["alt tab","switch windows"]},
+ methods:[{type:"shortcut",value:"Alt + Tab",best:true,compat:Y}]},
+{id:"sc-closewin",cat:"shortcuts",risk:"green",admin:false,compat:Y,
+ title:{he:"סגירת החלון הפעיל",en:"Close active window"},
+ desc:{he:"סוגר את החלון או התוכנה שבפוקוס.",en:"Closes the focused window or app."},
+ kw:{he:["alt f4","סגירת חלון","לסגור תוכנה"],en:["alt f4","close window"]},
+ methods:[{type:"shortcut",value:"Alt + F4",best:true,compat:Y}]},
+{id:"sc-snap",cat:"shortcuts",risk:"green",admin:false,compat:FROM7,
+ title:{he:"הצמדת חלונות לצדדים",en:"Snap windows"},
+ desc:{he:"Win + חץ מצמיד את החלון לחצי/רבע מסך — נוח לעבודה עם שני חלונות.",en:"Win + arrow snaps a window to half/quarter of the screen — great for side-by-side work."},
+ kw:{he:["snap","הצמדה","חלונות זה לצד זה","win חץ"],en:["snap","split screen","side by side"]},
+ methods:[{type:"shortcut",value:"Win + ← / → / ↑ / ↓",best:true,compat:FROM7}]},
+{id:"sc-winx",cat:"shortcuts",risk:"green",admin:false,compat:FROM8,
+ title:{he:"תפריט הכלים המהיר (Power User)",en:"Power User menu"},
+ desc:{he:"פותח תפריט קיצור לכלי ניהול: מנהל התקנים, ניהול דיסקים, טרמינל מנהל ועוד.",en:"Opens a shortcut menu to admin tools: Device Manager, Disk Management, admin Terminal and more."},
+ kw:{he:["win x","תפריט מהיר","כלי ניהול","power user"],en:["win x","power user menu","admin tools"]},
+ methods:[{type:"shortcut",value:"Win + X",best:true,compat:FROM8}]},
+{id:"sc-clipboard",cat:"shortcuts",risk:"green",admin:false,compat:FROM10,
+ title:{he:"היסטוריית לוח ההעתקה",en:"Clipboard history"},
+ desc:{he:"פותח את היסטוריית ההעתקות — כדי להדביק משהו שהעתקת קודם.",en:"Opens clipboard history — to paste something you copied earlier."},
+ kw:{he:["win v","לוח","היסטוריית העתקה","clipboard"],en:["win v","clipboard history"]},
+ methods:[{type:"shortcut",value:"Win + V",best:true,compat:FROM10}],
+ before:{he:"בפעם הראשונה צריך להפעיל את הפיצ'ר בלחיצה על הכפתור שמופיע.",en:"The first time, enable the feature via the button that appears."}},
+{id:"sc-emoji",cat:"shortcuts",risk:"green",admin:false,compat:FROM10,
+ title:{he:"אימוג'ים וסמלים",en:"Emoji & symbols"},
+ desc:{he:"פותח לוח אימוג'ים, סמלים ותווים מיוחדים בכל שדה טקסט.",en:"Opens an emoji, symbol and special-character panel in any text field."},
+ kw:{he:["אימוג'י","emoji","סמלים","win נקודה"],en:["emoji","symbols","win period"]},
+ methods:[{type:"shortcut",value:"Win + .",best:true,compat:FROM10}]},
+{id:"sc-newfolder",cat:"shortcuts",risk:"green",admin:false,compat:FROM7,
+ title:{he:"תיקייה חדשה",en:"New folder"},
+ desc:{he:"יוצר תיקייה חדשה במיקום הנוכחי בסייר הקבצים.",en:"Creates a new folder at the current spot in File Explorer."},
+ kw:{he:["תיקייה חדשה","new folder","ctrl shift n"],en:["new folder","ctrl shift n"]},
+ methods:[{type:"shortcut",value:"Ctrl + Shift + N",best:true,compat:FROM7}]},
+{id:"sc-rename",cat:"shortcuts",risk:"green",admin:false,compat:Y,
+ title:{he:"שינוי שם קובץ",en:"Rename a file"},
+ desc:{he:"בחר קובץ ולחץ F2 כדי לשנות את שמו.",en:"Select a file and press F2 to rename it."},
+ kw:{he:["שינוי שם","rename","f2"],en:["rename","f2"]},
+ methods:[{type:"shortcut",value:"F2",best:true,compat:Y}]}
+);
 
 /* ============================ TROUBLESHOOT TREES ============================ */
 const TREES=[
