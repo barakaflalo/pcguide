@@ -182,7 +182,7 @@
 const store=(()=>{let mem={};try{const k='__t';localStorage.setItem(k,'1');localStorage.removeItem(k);
   return{get:k=>localStorage.getItem(k),set:(k,v)=>localStorage.setItem(k,v),del:k=>localStorage.removeItem(k)};}
   catch(e){return{get:k=>k in mem?mem[k]:null,set:(k,v)=>mem[k]=String(v),del:k=>delete mem[k]};}})();
-const APP_VERSION="1.3.0";
+const APP_VERSION="1.4.0";
 
 /* ============================ i18n (UI) ============================ */
 const LANG={
@@ -852,8 +852,279 @@ ITEMS.push(
  methods:[{type:"shortcut",value:"Win + 1…9",best:true,compat:FROM7}]}
 );
 
+/* ---------- BATCH 4: depth + legacy coverage ---------- */
+ITEMS.push(
+/* NETWORK */
+{id:"net-wlanprofiles",cat:"network",risk:"green",admin:false,compat:FROMVISTA,
+ title:{he:"רשתות Wi-Fi שמורות",en:"Saved Wi-Fi networks"},desc:{he:"רשימת כל רשתות ה-Wi-Fi שהמחשב זוכר.",en:"Lists every Wi-Fi network the PC remembers."},
+ kw:{he:["wifi שמור","רשתות","profiles"],en:["saved wifi","profiles"]},
+ methods:[{type:"cmd",value:"netsh wlan show profiles",best:true,compat:FROMVISTA}],source:"https://learn.microsoft.com/windows-server/administration/windows-commands/netsh"},
+{id:"net-route",cat:"network",risk:"green",admin:false,compat:Y,
+ title:{he:"טבלת הניתוב",en:"Routing table"},desc:{he:"מציג את מסלולי הרשת של המחשב.",en:"Shows the PC's network routes."},
+ kw:{he:["route","ניתוב","gateway"],en:["route","routing","gateway"]},
+ methods:[{type:"cmd",value:"route print",best:true,compat:Y}],source:"https://learn.microsoft.com/windows-server/administration/windows-commands/route_ws-2008"},
+{id:"net-pathping",cat:"network",risk:"green",admin:false,compat:Y,
+ title:{he:"איתור איבוד חבילות (pathping)",en:"Packet-loss trace (pathping)"},desc:{he:"משלב tracert ו-ping — מראה היכן בדרך יש איבוד חבילות.",en:"Combines tracert and ping — shows where packets are lost."},
+ kw:{he:["pathping","איבוד חבילות","packet loss"],en:["pathping","packet loss"]},
+ methods:[{type:"cmd",value:"pathping google.com",best:true,compat:Y}],source:"https://learn.microsoft.com/windows-server/administration/windows-commands/pathping"},
+{id:"net-view",cat:"network",risk:"green",admin:false,compat:Y,
+ title:{he:"מחשבים משותפים ברשת",en:"Shared computers on the network"},desc:{he:"מציג מחשבים ומשאבים משותפים ברשת המקומית.",en:"Lists shared computers and resources on the LAN."},
+ kw:{he:["net view","שיתוף","מחשבים ברשת"],en:["net view","shares","network computers"]},
+ methods:[{type:"cmd",value:"net view",best:true,compat:Y}],source:"https://learn.microsoft.com/windows-server/administration/windows-commands/net-view"},
+{id:"net-use",cat:"network",risk:"yellow",admin:false,compat:Y,
+ title:{he:"מיפוי כונן רשת",en:"Map a network drive"},desc:{he:"מחבר תיקייה משותפת ברשת כאות כונן.",en:"Attaches a shared network folder as a drive letter."},
+ kw:{he:["net use","כונן רשת","מיפוי","share"],en:["net use","map drive","network drive"]},
+ methods:[{type:"cmd",value:'net use Z: \\\\server\\share',best:true,compat:Y}],
+ before:{he:"החלף את \\\\server\\share בנתיב האמיתי. לניתוק: net use Z: /delete.",en:"Replace \\\\server\\share with the real path. To disconnect: net use Z: /delete."},
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/net-use"},
+{id:"net-testconn",cat:"network",risk:"green",admin:false,compat:FROM8,
+ title:{he:"בדיקת חיבור לפורט (PowerShell)",en:"Test a port (PowerShell)"},desc:{he:"בודק אם אפשר להגיע לשרת בפורט מסוים — ping חכם יותר.",en:"Checks if a server is reachable on a given port — a smarter ping."},
+ kw:{he:["test-netconnection","פורט","חיבור","tnc"],en:["test-netconnection","port","tnc"]},
+ methods:[{type:"powershell",value:"Test-NetConnection google.com -Port 443",best:true,compat:FROM8}],source:"https://learn.microsoft.com/powershell/module/nettcpip/test-netconnection"},
+{id:"net-interface",cat:"network",risk:"yellow",admin:true,compat:FROMVISTA,
+ title:{he:"מתאמי רשת (הפעל/כבה)",en:"Network interfaces (enable/disable)"},desc:{he:"מציג ומאפשר להפעיל/לכבות מתאמי רשת משורת הפקודה.",en:"Lists and lets you enable/disable network interfaces from the CLI."},
+ kw:{he:["interface","מתאם","נטש"],en:["interface","adapter","netsh"]},
+ methods:[{type:"cmd",value:"netsh interface show interface",best:true,compat:FROMVISTA}],source:"https://learn.microsoft.com/windows-server/administration/windows-commands/netsh"},
+
+/* SYSTEM — CMD classics (work on old Windows too) */
+{id:"sys-ver",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"גרסה (ver)",en:"Version (ver)"},desc:{he:"מדפיס את גרסת Windows בשורת הפקודה.",en:"Prints the Windows version at the command line."},
+ kw:{he:["ver","גרסה"],en:["ver","version"]},methods:[{type:"cmd",value:"ver",best:true,compat:Y}]},
+{id:"sys-hostname",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"שם המחשב (hostname)",en:"Computer name (hostname)"},desc:{he:"מציג את שם המחשב ברשת.",en:"Shows the computer's network name."},
+ kw:{he:["hostname","שם מחשב"],en:["hostname","computer name"]},methods:[{type:"cmd",value:"hostname",best:true,compat:Y}]},
+{id:"sys-whoami",cat:"system",risk:"green",admin:false,compat:FROMVISTA,
+ title:{he:"מי אני (whoami)",en:"Who am I (whoami)"},desc:{he:"מציג את שם המשתמש הנוכחי וההרשאות שלו.",en:"Shows the current user and their privileges."},
+ kw:{he:["whoami","משתמש נוכחי","הרשאות"],en:["whoami","current user","privileges"]},
+ methods:[{type:"cmd",value:"whoami /priv",best:true,compat:FROMVISTA}]},
+{id:"sys-tasklist",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"רשימת תהליכים (tasklist)",en:"Process list (tasklist)"},desc:{he:"מציג את כל התהליכים הרצים וזיהוי ה-PID שלהם.",en:"Lists all running processes and their PIDs."},
+ kw:{he:["tasklist","תהליכים","pid"],en:["tasklist","processes","pid"]},methods:[{type:"cmd",value:"tasklist",best:true,compat:Y}]},
+{id:"sys-taskkill",cat:"system",risk:"yellow",admin:false,compat:Y,
+ title:{he:"סגירת תהליך בכוח (taskkill)",en:"Force-kill a process (taskkill)"},desc:{he:"סוגר תוכנה תקועה לפי שם או PID.",en:"Closes a stuck program by name or PID."},
+ kw:{he:["taskkill","לסגור בכוח","תהליך תקוע","kill"],en:["taskkill","force close","kill process"]},
+ methods:[{type:"cmd",value:"taskkill /IM chrome.exe /F",best:true,compat:Y}],
+ before:{he:"סגירה בכוח לא שומרת עבודה פתוחה בתוכנה. החלף chrome.exe בשם התהליך שלך.",en:"A forced kill won't save the app's open work. Replace chrome.exe with your process name."},
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/taskkill"},
+{id:"sys-netuser",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"חשבונות משתמשים (net user)",en:"User accounts (net user)"},desc:{he:"מציג את רשימת המשתמשים במחשב.",en:"Lists the accounts on the PC."},
+ kw:{he:["net user","משתמשים","חשבונות"],en:["net user","accounts","users"]},methods:[{type:"cmd",value:"net user",best:true,compat:Y}]},
+{id:"sys-driverquery",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"רשימת דרייברים (driverquery)",en:"Driver list (driverquery)"},desc:{he:"מציג את כל מנהלי ההתקנים המותקנים.",en:"Lists all installed drivers."},
+ kw:{he:["driverquery","דרייברים","מנהלי התקנים"],en:["driverquery","drivers"]},methods:[{type:"cmd",value:"driverquery",best:true,compat:Y}]},
+{id:"sys-gethotfix",cat:"system",risk:"green",admin:false,compat:FROM7,
+ title:{he:"עדכונים מותקנים (Get-HotFix)",en:"Installed updates (Get-HotFix)"},desc:{he:"מציג את עדכוני Windows שהותקנו ומתי.",en:"Lists installed Windows updates and when."},
+ kw:{he:["get-hotfix","עדכונים","kb","hotfix"],en:["get-hotfix","updates","kb"]},methods:[{type:"powershell",value:"Get-HotFix",best:true,compat:FROM7}]},
+{id:"sys-topproc",cat:"system",risk:"green",admin:false,compat:FROM7,
+ title:{he:"התהליכים הכבדים ביותר",en:"Heaviest processes"},desc:{he:"מציג את 10 התהליכים שצורכים הכי הרבה מעבד.",en:"Shows the 10 top CPU-consuming processes."},
+ kw:{he:["תהליכים כבדים","מעבד","cpu","get-process"],en:["heavy processes","cpu","get-process"]},
+ methods:[{type:"powershell",value:"Get-Process | Sort-Object CPU -Descending | Select-Object -First 10",best:true,compat:FROM7}]},
+{id:"sys-computerinfo",cat:"system",risk:"green",admin:false,compat:FROM10,
+ title:{he:"מידע מלא על המחשב (PowerShell)",en:"Full computer info (PowerShell)"},desc:{he:"סיכום מקיף של חומרה, מערכת וגרסה.",en:"A thorough summary of hardware, OS and version."},
+ kw:{he:["get-computerinfo","מפרט","מידע מחשב"],en:["get-computerinfo","spec","system info"]},methods:[{type:"powershell",value:"Get-ComputerInfo",best:true,compat:FROM10}]},
+{id:"sys-restartps",cat:"system",risk:"yellow",admin:false,compat:FROM7,
+ title:{he:"אתחול (PowerShell)",en:"Restart (PowerShell)"},desc:{he:"מאתחל את המחשב מ-PowerShell.",en:"Restarts the PC from PowerShell."},
+ kw:{he:["restart-computer","אתחול","reboot"],en:["restart-computer","reboot"]},
+ methods:[{type:"powershell",value:"Restart-Computer",best:true,compat:FROM7}],
+ before:{he:"סוגר את כל התוכנות — שמור עבודה פתוחה קודם.",en:"Closes all apps — save open work first."}},
+{id:"sys-winget",cat:"system",risk:"yellow",admin:false,compat:FROM10,
+ title:{he:"עדכון כל התוכנות (winget)",en:"Update all apps (winget)"},desc:{he:"מנהל החבילות של Windows — מעדכן את כל התוכנות המותקנות בפקודה אחת.",en:"Windows' package manager — updates all installed apps in one command."},
+ kw:{he:["winget","עדכון תוכנות","package manager"],en:["winget","update apps","package manager"]},
+ methods:[{type:"cmd",value:"winget upgrade --all",best:true,compat:FROM10}],
+ before:{he:"זמין ב-Windows 10 (1809 ומעלה) ו-11. יעדכן תוכנות רבות ברצף — ייקח זמן.",en:"Available on Windows 10 (1809+) and 11. Updates many apps in a row — takes time."},
+ source:"https://learn.microsoft.com/windows/package-manager/winget/"},
+
+/* SYSTEM — Run applets & accessories */
+{id:"sys-sound",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"הגדרות קול (Sound)",en:"Sound settings"},desc:{he:"מכשירי השמע, ברירת מחדל ועוצמה.",en:"Audio devices, defaults and volume."},
+ kw:{he:["קול","סאונד","mmsys","רמקולים"],en:["sound","audio","mmsys","speakers"]},methods:[{type:"run",value:"mmsys.cpl",best:true,compat:Y}]},
+{id:"sys-power",cat:"system",risk:"yellow",admin:false,compat:Y,
+ title:{he:"אפשרויות צריכת חשמל",en:"Power options"},desc:{he:"תוכניות צריכת חשמל, שינה וכיבוי מסך.",en:"Power plans, sleep and screen-off."},
+ kw:{he:["צריכת חשמל","power","שינה","סוללה","powercfg"],en:["power options","sleep","battery plan"]},methods:[{type:"run",value:"powercfg.cpl",best:true,compat:Y}]},
+{id:"sys-display",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"הגדרות תצוגה",en:"Display settings"},desc:{he:"רזולוציה, קנה מידה ומספר מסכים.",en:"Resolution, scale and multiple displays."},
+ kw:{he:["תצוגה","רזולוציה","desk.cpl","מסך"],en:["display","resolution","desk.cpl"]},methods:[{type:"run",value:"desk.cpl",best:true,compat:Y}]},
+{id:"sys-datetime",cat:"system",risk:"yellow",admin:false,compat:Y,
+ title:{he:"תאריך ושעה",en:"Date & time"},desc:{he:"כוונון תאריך, שעה ואזור זמן.",en:"Set date, time and time zone."},
+ kw:{he:["תאריך","שעה","אזור זמן","timedate"],en:["date","time","timezone","timedate"]},methods:[{type:"run",value:"timedate.cpl",best:true,compat:Y}]},
+{id:"sys-region",cat:"system",risk:"yellow",admin:false,compat:Y,
+ title:{he:"אזור ושפה (Region)",en:"Region & language"},desc:{he:"פורמט תאריך/מספר ושפת מערכת.",en:"Date/number format and system language."},
+ kw:{he:["אזור","שפה","intl","פורמט"],en:["region","language","intl","format"]},methods:[{type:"run",value:"intl.cpl",best:true,compat:Y}]},
+{id:"sys-mouse",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"הגדרות עכבר",en:"Mouse settings"},desc:{he:"מהירות, כפתורים וסמן העכבר.",en:"Speed, buttons and pointer."},
+ kw:{he:["עכבר","mouse","main.cpl","סמן"],en:["mouse","pointer","main.cpl"]},methods:[{type:"run",value:"main.cpl",best:true,compat:Y}]},
+{id:"sys-inet",cat:"system",risk:"yellow",admin:false,compat:Y,
+ title:{he:"אפשרויות אינטרנט",en:"Internet options"},desc:{he:"הגדרות פרוקסי, אבטחה ופרטיות (משמש גם דפדפנים).",en:"Proxy, security and privacy settings (used by browsers too)."},
+ kw:{he:["אינטרנט","פרוקסי","inetcpl","proxy"],en:["internet options","proxy","inetcpl"]},methods:[{type:"run",value:"inetcpl.cpl",best:true,compat:Y}]},
+{id:"sys-folderopts",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"אפשרויות סייר הקבצים",en:"File Explorer options"},desc:{he:"הצגת קבצים מוסתרים, סיומות קבצים ועוד.",en:"Show hidden files, file extensions and more."},
+ kw:{he:["אפשרויות תיקייה","קבצים מוסתרים","סיומות","folder options"],en:["folder options","hidden files","extensions"]},methods:[{type:"run",value:"control folders",best:true,compat:Y}]},
+{id:"sys-admintools",cat:"system",risk:"yellow",admin:false,compat:Y,
+ title:{he:"כלי ניהול (Administrative Tools)",en:"Administrative Tools"},desc:{he:"קיצור לכל כלי הניהול של Windows.",en:"A shortcut to all of Windows' admin tools."},
+ kw:{he:["כלי ניהול","admin tools"],en:["administrative tools","admin tools"]},methods:[{type:"run",value:"control admintools",best:true,compat:Y}]},
+{id:"sys-fonts",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"גופנים (Fonts)",en:"Fonts"},desc:{he:"תיקיית הגופנים המותקנים — צפייה, הוספה והסרה.",en:"The installed fonts folder — view, add, remove."},
+ kw:{he:["גופנים","fonts","פונטים"],en:["fonts","typefaces"]},methods:[{type:"run",value:"fonts",best:true,compat:Y}]},
+{id:"sys-charmap",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"מפת תווים (Character Map)",en:"Character Map"},desc:{he:"טבלת סמלים ותווים מיוחדים להעתקה.",en:"A table of symbols and special characters to copy."},
+ kw:{he:["מפת תווים","סמלים","charmap"],en:["character map","symbols","charmap"]},methods:[{type:"run",value:"charmap",best:true,compat:Y}]},
+{id:"sys-calc",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"מחשבון",en:"Calculator"},desc:{he:"פותח את המחשבון.",en:"Opens the calculator."},
+ kw:{he:["מחשבון","calc"],en:["calculator","calc"]},methods:[{type:"run",value:"calc",best:true,compat:Y}]},
+{id:"sys-notepad",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"פנקס רשימות",en:"Notepad"},desc:{he:"פותח עורך טקסט פשוט.",en:"Opens a simple text editor."},
+ kw:{he:["notepad","פנקס","עורך טקסט"],en:["notepad","text editor"]},methods:[{type:"run",value:"notepad",best:true,compat:Y}]},
+{id:"sys-osk",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"מקלדת על המסך",en:"On-Screen Keyboard"},desc:{he:"מקלדת וירטואלית — שימושי כשמקש פיזי לא עובד.",en:"A virtual keyboard — handy when a physical key fails."},
+ kw:{he:["מקלדת על המסך","osk","מקלדת וירטואלית"],en:["on-screen keyboard","osk"]},methods:[{type:"run",value:"osk",best:true,compat:Y}]},
+{id:"sys-magnify",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"זכוכית מגדלת (Magnifier)",en:"Magnifier"},desc:{he:"מגדיל אזורים במסך — נגישות.",en:"Zooms parts of the screen — accessibility."},
+ kw:{he:["זכוכית מגדלת","הגדלה","magnifier","נגישות"],en:["magnifier","zoom","accessibility"]},methods:[{type:"run",value:"magnify",best:true,compat:Y}]},
+{id:"sys-snipapp",cat:"system",risk:"green",admin:false,compat:FROMVISTA,
+ title:{he:"כלי חיתוך (Snipping Tool)",en:"Snipping Tool"},desc:{he:"פותח את כלי צילום/חיתוך המסך.",en:"Opens the screen snip tool."},
+ kw:{he:["snipping","חיתוך","צילום מסך"],en:["snipping tool","screenshot"]},methods:[{type:"run",value:"snippingtool",best:true,compat:FROMVISTA}]},
+
+/* SYSTEM — advanced / risky */
+{id:"sys-restore",cat:"system",risk:"yellow",admin:true,compat:Y,reversible:true,
+ title:{he:"שחזור מערכת (System Restore)",en:"System Restore"},desc:{he:"מחזיר את המערכת לנקודת זמן קודמת בלי לגעת בקבצים האישיים.",en:"Rolls the system back to an earlier point without touching personal files."},
+ kw:{he:["שחזור מערכת","rstrui","נקודת שחזור","restore"],en:["system restore","rstrui","restore point"]},
+ methods:[{type:"run",value:"rstrui",best:true,compat:Y}],
+ before:{he:"בחר נקודה מלפני שהתקלה התחילה. תוכנות שהותקנו אחרי הנקודה יוסרו; קבצים אישיים לא נפגעים.",en:"Pick a point from before the trouble began. Apps installed after it are removed; personal files are safe."},
+ source:"https://learn.microsoft.com/windows/"},
+{id:"sys-verifier",cat:"system",risk:"red",admin:true,compat:Y,reversible:true,
+ title:{he:"מאמת הדרייברים (Driver Verifier)",en:"Driver Verifier"},desc:{he:"כלי לאיתור דרייבר בעייתי שגורם למסך כחול — למתקדמים בלבד.",en:"A tool to catch a faulty driver causing blue screens — advanced only."},
+ kw:{he:["verifier","מסך כחול","bsod","דרייבר בעייתי"],en:["verifier","bsod","blue screen","bad driver"]},
+ methods:[{type:"run",value:"verifier",best:true,compat:Y}],
+ before:{he:"הפעלה שגויה עלולה להכניס את המחשב ללולאת מסך כחול באתחול. הפעל רק אם אתה יודע מה אתה עושה, ורק אחרי יצירת נקודת שחזור.",en:"Misuse can put the PC into a blue-screen boot loop. Use only if you know what you're doing, and after creating a restore point."},
+ undo:{he:"לביטול כל הבדיקות: verifier /reset (משורת פקודה כמנהל), ואתחל.",en:"To turn everything off: verifier /reset (admin CMD), then restart."},
+ source:"https://learn.microsoft.com/windows-hardware/drivers/devtest/driver-verifier"},
+{id:"sys-bcdedit",cat:"system",risk:"red",admin:true,compat:FROMVISTA,reversible:false,
+ title:{he:"הגדרות אתחול (bcdedit)",en:"Boot configuration (bcdedit)"},desc:{he:"עורך את הגדרות ה-Boot של Windows — כלי רב-עוצמה ומסוכן.",en:"Edits Windows boot settings — powerful and dangerous."},
+ kw:{he:["bcdedit","אתחול","boot","bootloader"],en:["bcdedit","boot","bootloader"]},
+ methods:[{type:"cmd",value:"bcdedit",best:true,compat:FROMVISTA}],
+ before:{he:"שינוי שגוי עלול למנוע מ-Windows לעלות. הרצה בלי פרמטרים רק מציגה מידע (בטוח). אל תשנה בלי לדעת בדיוק מה.",en:"A wrong change can stop Windows booting. Running with no parameters only displays info (safe). Don't change anything without knowing exactly what."},
+ source:"https://learn.microsoft.com/windows-hardware/manufacture/desktop/bcdedit-command-line-options"},
+
+/* DISK */
+{id:"disk-getvolume",cat:"disk",risk:"green",admin:false,compat:FROM8,
+ title:{he:"רשימת כוננים (Get-Volume)",en:"List volumes (Get-Volume)"},desc:{he:"מציג כוננים, מקום פנוי ומערכת קבצים.",en:"Shows drives, free space and file system."},
+ kw:{he:["get-volume","כוננים","מקום פנוי"],en:["get-volume","drives","free space"]},methods:[{type:"powershell",value:"Get-Volume",best:true,compat:FROM8}]},
+{id:"disk-dirty",cat:"disk",risk:"green",admin:true,compat:FROMVISTA,
+ title:{he:"בדיקת 'דיסק מלוכלך' (fsutil)",en:"Check dirty bit (fsutil)"},desc:{he:"בודק אם Windows סימן את הכונן לבדיקה באתחול הבא.",en:"Checks if Windows flagged the drive for a boot-time scan."},
+ kw:{he:["fsutil","dirty","דיסק מלוכלך","chkdsk"],en:["fsutil","dirty bit","chkdsk"]},methods:[{type:"cmd",value:"fsutil dirty query C:",best:true,compat:FROMVISTA}]},
+{id:"disk-vss",cat:"disk",risk:"green",admin:true,compat:FROMVISTA,
+ title:{he:"עותקי צל (Shadow Copies)",en:"Shadow copies"},desc:{he:"מציג את עותקי הצל — גיבויים אוטומטיים ששחזור מערכת משתמש בהם.",en:"Lists shadow copies — the automatic snapshots System Restore uses."},
+ kw:{he:["vssadmin","עותקי צל","shadow","גיבוי"],en:["vssadmin","shadow copies","snapshots"]},methods:[{type:"cmd",value:"vssadmin list shadows",best:true,compat:FROMVISTA}]},
+{id:"disk-tree",cat:"disk",risk:"green",admin:false,compat:Y,
+ title:{he:"מבנה תיקיות (tree)",en:"Folder tree (tree)"},desc:{he:"מצייר את מבנה התיקיות של הנתיב הנוכחי.",en:"Draws the folder structure of the current path."},
+ kw:{he:["tree","מבנה תיקיות","עץ"],en:["tree","folder structure"]},methods:[{type:"cmd",value:"tree /f",best:true,compat:Y}]},
+{id:"disk-mountvol",cat:"disk",risk:"yellow",admin:true,compat:Y,
+ title:{he:"אותיות כונן (mountvol)",en:"Drive mounts (mountvol)"},desc:{he:"מציג ומנהל את שיוך אותיות הכונן.",en:"Lists and manages drive-letter mounts."},
+ kw:{he:["mountvol","אות כונן","עגינה"],en:["mountvol","drive letter","mount"]},methods:[{type:"cmd",value:"mountvol",best:true,compat:Y}]},
+
+/* CLEANUP */
+{id:"clean-recyclebin",cat:"cleanup",risk:"yellow",admin:false,compat:FROM10,
+ title:{he:"רוקן סל מיחזור (PowerShell)",en:"Empty Recycle Bin (PowerShell)"},desc:{he:"מרוקן את סל המיחזור בכל הכוננים בפקודה אחת.",en:"Empties the Recycle Bin on all drives in one command."},
+ kw:{he:["סל מיחזור","recycle bin","רוקן"],en:["recycle bin","empty"]},
+ methods:[{type:"powershell",value:"Clear-RecycleBin -Force",best:true,compat:FROM10}],
+ before:{he:"הקבצים יימחקו לצמיתות — אין חזרה מסל המיחזור אחרי זה.",en:"Files are permanently deleted — no getting them back from the bin afterwards."}},
+{id:"clean-cipher",cat:"cleanup",risk:"yellow",admin:false,compat:FROMVISTA,
+ title:{he:"מחיקת מקום פנוי לצמיתות (cipher)",en:"Wipe free space (cipher)"},desc:{he:"מוחק לצמיתות קבצים שכבר נמחקו, כך שלא ניתן לשחזר אותם.",en:"Permanently overwrites already-deleted files so they can't be recovered."},
+ kw:{he:["cipher","מחיקה בטוחה","wipe","מקום פנוי"],en:["cipher","secure wipe","free space"]},
+ methods:[{type:"cmd",value:"cipher /w:C",best:true,compat:FROMVISTA}],
+ before:{he:"התהליך יכול לקחת שעות בכונן גדול. לא מוחק קבצים קיימים — רק מרסק שאריות של קבצים שנמחקו.",en:"Can take hours on a large drive. It doesn't delete existing files — only shreds remnants of deleted ones."}},
+{id:"clean-winsxs",cat:"cleanup",risk:"yellow",admin:true,compat:FROM8,
+ title:{he:"ניקוי רכיבי מערכת (WinSxS)",en:"Clean component store (WinSxS)"},desc:{he:"מפנה מקום ע\"י מחיקת גרסאות ישנות של רכיבי מערכת.",en:"Frees space by removing superseded system-component versions."},
+ kw:{he:["winsxs","dism","ניקוי רכיבים","startcomponentcleanup"],en:["winsxs","dism","component cleanup"]},
+ methods:[{type:"cmd",value:"DISM /Online /Cleanup-Image /StartComponentCleanup",best:true,compat:FROM8}],
+ before:{he:"בטוח לרוב, אך יכול לקחת זמן. אחרי הרצה, ביטול של עדכונים שהותקנו לא יתאפשר.",en:"Usually safe but can take a while. After running, you can't uninstall the updates it cleaned up."},
+ source:"https://learn.microsoft.com/windows-hardware/manufacture/desktop/clean-up-the-winsxs-folder"},
+
+/* SECURITY */
+{id:"sec-defstatus",cat:"security",risk:"green",admin:false,compat:FROM10,
+ title:{he:"מצב Defender (PowerShell)",en:"Defender status (PowerShell)"},desc:{he:"מציג אם ההגנה פעילה ומתי הייתה סריקה אחרונה.",en:"Shows whether protection is on and the last scan time."},
+ kw:{he:["defender status","הגנה פעילה","get-mpcomputerstatus"],en:["defender status","protection","get-mpcomputerstatus"]},methods:[{type:"powershell",value:"Get-MpComputerStatus",best:true,compat:FROM10}]},
+{id:"sec-updatedefs",cat:"security",risk:"green",admin:false,compat:FROM10,
+ title:{he:"עדכון הגדרות וירוסים",en:"Update virus definitions"},desc:{he:"מוריד את עדכוני הזיהוי האחרונים של Defender.",en:"Downloads Defender's latest detection updates."},
+ kw:{he:["עדכון הגדרות","update-mpsignature","וירוסים"],en:["update definitions","update-mpsignature"]},methods:[{type:"powershell",value:"Update-MpSignature",best:true,compat:FROM10}]},
+{id:"sec-certmgr",cat:"security",risk:"yellow",admin:false,compat:Y,
+ title:{he:"אישורי אבטחה (Certificates)",en:"Certificates"},desc:{he:"מנהל את אישורי ה-SSL/דיגיטליים של המשתמש.",en:"Manages the user's SSL/digital certificates."},
+ kw:{he:["certmgr","אישורים","תעודות","certificates"],en:["certmgr","certificates","ssl"]},methods:[{type:"run",value:"certmgr.msc",best:true,compat:Y}]},
+{id:"sec-secpol",cat:"security",risk:"yellow",admin:true,compat:Y,
+ title:{he:"מדיניות אבטחה מקומית",en:"Local Security Policy"},desc:{he:"הגדרות מדיניות סיסמאות, נעילת חשבון ואבטחה. Pro בלבד.",en:"Password, lockout and security policy settings. Pro only."},
+ kw:{he:["secpol","מדיניות אבטחה","סיסמאות"],en:["secpol","security policy"]},
+ methods:[{type:"run",value:"secpol.msc",best:true,compat:Y}],
+ before:{he:"קיים רק ב-Windows Pro/Enterprise. שינויים משפיעים על אבטחת המערכת כולה.",en:"Only on Windows Pro/Enterprise. Changes affect the whole system's security."}},
+{id:"sec-lusrmgr",cat:"security",risk:"yellow",admin:true,compat:Y,
+ title:{he:"משתמשים וקבוצות מקומיים",en:"Local Users and Groups"},desc:{he:"ניהול מפורט של חשבונות וקבוצות. Pro בלבד.",en:"Detailed management of accounts and groups. Pro only."},
+ kw:{he:["lusrmgr","משתמשים","קבוצות"],en:["lusrmgr","users","groups"]},
+ methods:[{type:"run",value:"lusrmgr.msc",best:true,compat:Y}],
+ before:{he:"קיים רק ב-Windows Pro/Enterprise.",en:"Only on Windows Pro/Enterprise."}},
+{id:"sec-gpupdate",cat:"security",risk:"green",admin:true,compat:Y,
+ title:{he:"רענון מדיניות (gpupdate)",en:"Refresh policy (gpupdate)"},desc:{he:"מחיל מיד שינויי מדיניות קבוצתית בלי אתחול.",en:"Applies group-policy changes immediately without a restart."},
+ kw:{he:["gpupdate","מדיניות","רענון"],en:["gpupdate","policy refresh"]},methods:[{type:"cmd",value:"gpupdate /force",best:true,compat:Y}]},
+
+/* SHORTCUTS */
+{id:"sc-search",cat:"shortcuts",risk:"green",admin:false,compat:FROM10,
+ title:{he:"חיפוש ב-Windows",en:"Windows Search"},desc:{he:"פותח את החיפוש של Windows.",en:"Opens Windows Search."},
+ kw:{he:["חיפוש","win s","search"],en:["search","win s"]},methods:[{type:"shortcut",value:"Win + S",best:true,compat:FROM10}]},
+{id:"sc-quicksettings",cat:"shortcuts",risk:"green",admin:false,compat:FROM10,
+ title:{he:"הגדרות מהירות / מרכז פעולות",en:"Quick settings / Action Center"},desc:{he:"פותח את פאנל ההגדרות המהירות (Wi-Fi, בהירות, בלוטות').",en:"Opens the quick-settings panel (Wi-Fi, brightness, Bluetooth)."},
+ kw:{he:["מרכז פעולות","הגדרות מהירות","win a"],en:["action center","quick settings","win a"]},methods:[{type:"shortcut",value:"Win + A",best:true,compat:FROM10}]},
+{id:"sc-minall",cat:"shortcuts",risk:"green",admin:false,compat:Y,
+ title:{he:"מזער את כל החלונות",en:"Minimize all windows"},desc:{he:"ממזער הכל בבת אחת.",en:"Minimizes everything at once."},
+ kw:{he:["מזער הכל","win m"],en:["minimize all","win m"]},methods:[{type:"shortcut",value:"Win + M",best:true,compat:Y}]},
+{id:"sc-selectall",cat:"shortcuts",risk:"green",admin:false,compat:Y,
+ title:{he:"בחר הכל",en:"Select all"},desc:{he:"בוחר את כל הפריטים או הטקסט.",en:"Selects all items or text."},
+ kw:{he:["בחר הכל","ctrl a"],en:["select all","ctrl a"]},methods:[{type:"shortcut",value:"Ctrl + A",best:true,compat:Y}]},
+{id:"sc-findtext",cat:"shortcuts",risk:"green",admin:false,compat:Y,
+ title:{he:"חיפוש בתוך הדף/מסמך",en:"Find in page/document"},desc:{he:"פותח חיפוש בתוך התוכן הנוכחי.",en:"Opens find within the current content."},
+ kw:{he:["חיפוש","ctrl f","מצא"],en:["find","ctrl f","search in page"]},methods:[{type:"shortcut",value:"Ctrl + F",best:true,compat:Y}]},
+{id:"sc-save",cat:"shortcuts",risk:"green",admin:false,compat:Y,
+ title:{he:"שמירה",en:"Save"},desc:{he:"שומר את הקובץ הנוכחי.",en:"Saves the current file."},
+ kw:{he:["שמירה","ctrl s"],en:["save","ctrl s"]},methods:[{type:"shortcut",value:"Ctrl + S",best:true,compat:Y}]},
+{id:"sc-undoredo",cat:"shortcuts",risk:"green",admin:false,compat:Y,
+ title:{he:"בטל / בצע שוב",en:"Undo / Redo"},desc:{he:"Ctrl+Z מבטל פעולה, Ctrl+Y מבצע אותה שוב.",en:"Ctrl+Z undoes, Ctrl+Y redoes."},
+ kw:{he:["בטל","undo","redo","ctrl z"],en:["undo","redo","ctrl z"]},methods:[{type:"shortcut",value:"Ctrl + Z / Ctrl + Y",best:true,compat:Y}]},
+{id:"sc-gamebar",cat:"shortcuts",risk:"green",admin:false,compat:FROM10,
+ title:{he:"סרגל המשחקים / הקלטת מסך",en:"Game Bar / screen record"},desc:{he:"פותח את Game Bar — כולל הקלטת מסך מובנית.",en:"Opens Game Bar — includes built-in screen recording."},
+ kw:{he:["game bar","הקלטת מסך","win g"],en:["game bar","screen record","win g"]},methods:[{type:"shortcut",value:"Win + G",best:true,compat:FROM10}]},
+{id:"sc-dictate",cat:"shortcuts",risk:"green",admin:false,compat:FROM10,
+ title:{he:"הקלדה בדיבור",en:"Voice typing"},desc:{he:"מכתיב טקסט בדיבור לכל שדה.",en:"Dictate text by voice into any field."},
+ kw:{he:["דיבור","הכתבה","win h","voice"],en:["voice typing","dictation","win h"]},methods:[{type:"shortcut",value:"Win + H",best:true,compat:FROM10}]},
+{id:"sc-magkey",cat:"shortcuts",risk:"green",admin:false,compat:FROMVISTA,
+ title:{he:"הגדלת המסך (זכוכית מגדלת)",en:"Zoom screen (Magnifier)"},desc:{he:"Win ופלוס מגדיל, Win ומינוס מקטין.",en:"Win and Plus zooms in, Win and Minus zooms out."},
+ kw:{he:["הגדלה","זכוכית","win plus","magnifier"],en:["zoom","magnifier","win plus"]},methods:[{type:"shortcut",value:"Win + (+ / −)",best:true,compat:FROMVISTA}]}
+);
+
 /* ============================ TROUBLESHOOT TREES ============================ */
 const TREES=[
+ {id:"t-update",cat:"troubleshoot",em:"🔄",
+  title:{he:"Windows לא מתעדכן",en:"Windows won't update"},
+  intro:{he:"רוב תקלות העדכון נפתרות בפותר הבעיות, בפינוי מקום, או באיפוס מטמון העדכונים.",en:"Most update failures are fixed by the troubleshooter, freeing space, or resetting the update cache."},
+  steps:[
+   {do:{he:"הפעל את פותר הבעיות של Windows Update.",en:"Run the Windows Update troubleshooter."},
+    check:{he:"הגדרות ← עדכון ואבטחה / מערכת ← פתרון בעיות ← Windows Update. מתקן הרבה תקלות לבד.",en:"Settings → Update & Security / System → Troubleshoot → Windows Update. Fixes many issues on its own."}},
+   {do:{he:"פנה מקום פנוי בדיסק.",en:"Free up disk space."},cmd:"cleanmgr",
+    check:{he:"עדכונים נכשלים כשאין מספיק מקום. שאף לכמה גיגה פנויים בכונן המערכת.",en:"Updates fail when space is low. Aim for a few free GB on the system drive."}},
+   {do:{he:"אפס את מטמון העדכונים.",en:"Reset the update cache."},cmd:"net stop wuauserv && net stop bits",
+    check:{he:"כמנהל. אחר כך שנה את שם התיקייה C:\\Windows\\SoftwareDistribution ל-.old, והפעל שוב: net start wuauserv && net start bits.",en:"As admin. Then rename C:\\Windows\\SoftwareDistribution to .old, and restart: net start wuauserv && net start bits."}},
+   {do:{he:"תקן קבצי מערכת פגומים.",en:"Repair corrupt system files."},cmd:"DISM /Online /Cleanup-Image /RestoreHealth",
+    check:{he:"אחריו הרץ sfc /scannow. קבצי מערכת פגומים חוסמים עדכונים.",en:"Then run sfc /scannow. Corrupt system files block updates."}},
+  ]},
+ {id:"t-appcrash",cat:"troubleshoot",em:"💥",
+  title:{he:"אפליקציה קורסת / לא נפתחת",en:"App crashes / won't open"},
+  intro:{he:"נבדוק תהליך תקוע, יומן שגיאות, קבצי מערכת, ואיפוס/התקנה מחדש.",en:"We'll check a stuck process, the error log, system files, and reset/reinstall."},
+  steps:[
+   {do:{he:"ודא שאין תהליך תקוע ברקע, ופתח מחדש.",en:"Make sure no stuck process is lingering, then reopen."},cmd:"taskmgr",
+    check:{he:"אם התוכנה מופיעה בתהליכים — סיים משימה, ואז פתח שוב מאפס.",en:"If the app shows in Processes — End task, then open it fresh."}},
+   {do:{he:"בדוק מה קרה ביומן האירועים.",en:"Check what happened in the event log."},cmd:"eventvwr.msc",
+    check:{he:"יומני Windows ← יישום. חפש שגיאה (אדום) בזמן הקריסה — היא מרמזת על הסיבה.",en:"Windows Logs → Application. Look for an error (red) at crash time — it hints at the cause."}},
+   {do:{he:"תקן קבצי מערכת.",en:"Repair system files."},cmd:"sfc /scannow",
+    check:{he:"אם נמצאו בעיות ותוקנו — נסה שוב. נכשל? הרץ DISM ואז שוב sfc.",en:"If issues were found & fixed — try again. Failed? Run DISM then sfc again."}},
+   {do:{he:"אפליקציה מהחנות — אפס מטמון; אפליקציה רגילה — התקן מחדש.",en:"Store app — reset cache; regular app — reinstall."},cmd:"wsreset",
+    check:{he:"לאפליקציית חנות: wsreset. לתוכנה רגילה: הסר והתקן מחדש דרך appwiz.cpl, או הרץ במצב תאימות.",en:"Store app: wsreset. Regular software: reinstall via appwiz.cpl, or run in compatibility mode."}},
+  ]},
  {id:"t-sound",cat:"troubleshoot",em:"🔇",
   title:{he:"אין קול",en:"No sound"},
   intro:{he:"נבדוק מהפשוט למורכב: מכשיר הפלט → פותר בעיות → שירות השמע → דרייבר.",en:"From simple to complex: output device → troubleshooter → audio service → driver."},
@@ -957,6 +1228,13 @@ function guiPath(m){/* resolve gui path for version + sys lang with fallback */
 
 const METHOD_LABEL={shortcut:{he:"קיצור מקשים",en:"Keyboard shortcut"},run:{he:"חלון הפעלה (Win+R)",en:"Run (Win+R)"},
  cmd:{he:"שורת פקודה (CMD)",en:"Command Prompt (CMD)"},powershell:{he:"PowerShell",en:"PowerShell"},gui:{he:"דרך התפריטים",en:"Through the menus"}};
+const TYPE_CHIPS=[
+ {type:"shortcut",em:"⌨️",he:"קיצורי מקשים",en:"Shortcuts"},
+ {type:"run",em:"▶️",he:"פקודות Run",en:"Run commands"},
+ {type:"cmd",em:"💻",he:"פקודות CMD",en:"CMD commands"},
+ {type:"powershell",em:"🔵",he:"PowerShell",en:"PowerShell"},
+ {type:"gui",em:"🖱️",he:"מסלולי תפריטים",en:"Menu paths"},
+];
 
 /* ============================ ROUTER ============================ */
 let stack=[];
@@ -972,6 +1250,7 @@ function render(screen,param){
   if(screen==='item')return renderItem(c,param);
   if(screen==='tree')return renderTree(c,param);
   if(screen==='favs')return renderFavs(c);
+  if(screen==='type')return renderType(c,param);
   if(screen==='settings')return renderSettings(c);
   if(screen==='about')return renderAbout(c);
 }
@@ -1015,7 +1294,19 @@ function renderHome(c){
   fav.onclick=()=>go('favs');g.appendChild(fav);
   c.appendChild(g);
 
-  c.appendChild(el('div','footer',`AppNest · ${esc(T('brand'))} · v${APP_VERSION} — <b>barakaflalo.github.io/appnest</b>`));
+  // browse by command type
+  const he=P.uiLang==='he';
+  c.appendChild(el('div','sectitle',he?'עיון לפי סוג פקודה':'Browse by command type'));
+  const trow=el('div');trow.style.cssText='display:flex;flex-wrap:wrap;gap:8px';
+  TYPE_CHIPS.forEach(tc=>{
+    const n=ITEMS.filter(i=>i.methods.some(m=>m.type===tc.type)).length;
+    const b=el('button','choice');
+    b.innerHTML=`${tc.em} ${esc(L(tc))} <span style="opacity:.55">· ${n}</span>`;
+    b.onclick=()=>go('type',tc.type);trow.appendChild(b);
+  });
+  c.appendChild(trow);
+
+  c.appendChild(el('div','footer',`AppNest · ${esc(T('brand'))} · v${APP_VERSION} · ${ITEMS.length} ${he?'פקודות':'commands'} — <b>barakaflalo.github.io/appnest</b>`));
 }
 
 function itemRow(it){
@@ -1163,6 +1454,17 @@ function renderTree(c,id){
   });
 }
 
+function renderType(c,type){
+  c.appendChild(backBtn());
+  const tc=TYPE_CHIPS.find(x=>x.type===type)||{em:"",he:type,en:type};
+  const head=el('div','hero');
+  head.innerHTML=`<h1>${tc.em} ${esc(L(tc))}</h1><p>${P.uiLang==='he'?'כל הפעולות שאפשר לבצע כך':'Every action you can do this way'}</p>`;
+  c.appendChild(head);
+  const list=ITEMS.filter(i=>i.methods.some(m=>m.type===type));
+  list.sort((a,b)=>(itemSupported(b)?1:0)-(itemSupported(a)?1:0));
+  list.forEach(it=>c.appendChild(itemRow(it)));
+  if(!list.length)c.appendChild(el('div','empty',esc(T('noResults'))));
+}
 function renderFavs(c){
   c.appendChild(backBtn());
   const h=el('div','hero');h.innerHTML=`<h1>⭐ ${esc(T('favs'))}</h1>`;c.appendChild(h);

@@ -1,6 +1,6 @@
 /* AppNest · מדריך המחשב — Service Worker
    Bump CACHE_VERSION on every release so clients pick up the new files. */
-const CACHE_VERSION = "pcguide-v1.3.0";
+const CACHE_VERSION = "pcguide-v1.4.0";
 const ASSETS = [
   "./",
   "./index.html",
