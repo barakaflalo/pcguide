@@ -1,0 +1,18 @@
+{
+  "name": "מדריך המחשב · AppNest",
+  "short_name": "מדריך המחשב",
+  "description": "כל הפקודות והקיצורים של Windows במקום אחד — CMD, PowerShell, Run, קיצורי מקשים ותיקון תקלות מודרך. עובד אופליין, ללא חשבון.",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "categories": ["education", "utilities", "productivity"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

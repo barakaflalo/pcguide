@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" data-theme="gold">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<title>מדריך המחשב · AppNest</title>
+<style>
+  :root{
+    --green:#34c759; --yellow:#ffb020; --red:#ff453a;
+    --radius:14px; --maxw:820px;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+
+  html[data-theme="gold"]{--bg:#0a0a0a;--surface:#151515;--surface2:#1e1e1e;--border:#2c2c2c;--text:#f1ead6;--muted:#9a927e;--accent:#d4af37;--accent-ink:#0a0a0a;--accent-soft:rgba(212,175,55,.12)}
+  html[data-theme="sapphire"]{--bg:#0a0e1a;--surface:#131a2a;--surface2:#1b2438;--border:#2a3550;--text:#e7ecf7;--muted:#8593b0;--accent:#5aa2ff;--accent-ink:#06101f;--accent-soft:rgba(90,162,255,.14)}
+  html[data-theme="emerald"]{--bg:#08120d;--surface:#10201a;--surface2:#172c23;--border:#22402f;--text:#e4f0e9;--muted:#82a893;--accent:#37d39b;--accent-ink:#04140d;--accent-soft:rgba(55,211,155,.14)}
+  html[data-theme="crimson"]{--bg:#130808;--surface:#221010;--surface2:#2d1717;--border:#43201f;--text:#f6e7e7;--muted:#b18787;--accent:#ff6b6b;--accent-ink:#160404;--accent-soft:rgba(255,107,107,.14)}
+  html[data-theme="daylight"]{--bg:#f2efe7;--surface:#ffffff;--surface2:#f6f3ea;--border:#ddd5c4;--text:#1c1a15;--muted:#6d6553;--accent:#b8860b;--accent-ink:#ffffff;--accent-soft:rgba(184,134,11,.12)}
+
+  body{
+    margin:0;font-family:'Segoe UI','Assistant',system-ui,-apple-system,Arial,sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.5;
+    -webkit-tap-highlight-color:transparent;min-height:100vh;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 16px 64px}
+  .mono{font-family:'Cascadia Code','Consolas','SF Mono',ui-monospace,monospace;direction:ltr;unicode-bidi:isolate}
+
+  /* Header */
+  header{position:sticky;top:env(safe-area-inset-top,0);z-index:20;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+  .hbar{max-width:var(--maxw);margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
+  .brand{font-weight:800;font-size:18px;letter-spacing:.2px;cursor:pointer;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:10px;height:10px;border-radius:3px;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+  .spacer{flex:1}
+  .iconbtn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .15s}
+  .iconbtn:hover{border-color:var(--accent)}
+  .pcchip{display:flex;align-items:center;gap:7px;border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer;color:var(--muted);transition:border-color .15s}
+  .pcchip:hover{border-color:var(--accent)}
+  .pcchip b{color:var(--text);font-weight:600}
+
+  /* Buttons */
+  .btn{border:1px solid var(--border);background:var(--surface);color:var(--text);padding:11px 16px;border-radius:11px;font-size:15px;cursor:pointer;font-family:inherit;transition:.15s;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.block{width:100%}
+  .btn.ghost{background:transparent}
+  .backbtn{margin:18px 0 6px;font-weight:700}
+
+  /* Home */
+  .hero{padding:30px 4px 8px}
+  .hero h1{font-size:27px;margin:0 0 6px;font-weight:800;letter-spacing:.2px}
+  .hero p{margin:0;color:var(--muted);font-size:15px}
+  .search{margin:20px 0 8px;position:relative}
+  .search input{width:100%;padding:15px 46px 15px 16px;border-radius:13px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:16px;font-family:inherit}
+  html[dir="ltr"] .search input{padding:15px 16px 15px 46px}
+  .search input:focus{outline:none;border-color:var(--accent)}
+  .search .mag{position:absolute;top:50%;transform:translateY(-50%);right:16px;color:var(--muted);pointer-events:none}
+  html[dir="ltr"] .search .mag{right:auto;left:16px}
+
+  .sectitle{font-size:13px;color:var(--muted);margin:26px 2px 10px;font-weight:600}
+
+  .troublecard{border:1px solid var(--accent);background:var(--accent-soft);border-radius:var(--radius);padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:.15s;margin-bottom:8px}
+  .troublecard:hover{filter:brightness(1.06)}
+  .troublecard .em{font-size:26px}
+  .troublecard h3{margin:0 0 2px;font-size:16px}
+  .troublecard p{margin:0;color:var(--muted);font-size:13px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .cat{border:1px solid var(--border);background:var(--surface);border-radius:var(--radius);padding:16px 14px;cursor:pointer;transition:.15s;text-align:start}
+  .cat:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .cat .em{font-size:24px;display:block;margin-bottom:8px}
+  .cat h3{margin:0 0 3px;font-size:15px}
+  .cat span{color:var(--muted);font-size:12px}
+
+  /* List items */
+  .item{border:1px solid var(--border);background:var(--surface);border-radius:var(--radius);padding:14px 16px;margin-bottom:9px;cursor:pointer;transition:.15s;display:flex;align-items:flex-start;gap:12px}
+  .item:hover{border-color:var(--accent)}
+  .item.dim{opacity:.5}
+  .item .risk{width:9px;height:9px;border-radius:50%;margin-top:7px;flex:none}
+  .risk.green{background:var(--green)} .risk.yellow{background:var(--yellow)} .risk.red{background:var(--red)}
+  .item .body{flex:1;min-width:0}
+  .item h3{margin:0 0 2px;font-size:16px}
+  .item p{margin:0;color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .item .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+  .tag{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);color:var(--muted)}
+  .tag.admin{border-color:var(--yellow);color:var(--yellow)}
+  .tag.unsupported{border-color:var(--red);color:var(--red)}
+
+  /* Detail card */
+  .detail{border:1px solid var(--border);background:var(--surface);border-radius:var(--radius);padding:20px;margin-top:8px}
+  .detail h2{margin:0 0 4px;font-size:22px}
+  .detail .sub{color:var(--muted);font-size:14px;margin:0 0 16px}
+  .risk-banner{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:11px;margin:14px 0;font-size:14px;font-weight:600}
+  .risk-banner.green{background:color-mix(in srgb,var(--green) 14%,transparent);color:var(--green)}
+  .risk-banner.yellow{background:color-mix(in srgb,var(--yellow) 15%,transparent);color:var(--yellow)}
+  .risk-banner.red{background:color-mix(in srgb,var(--red) 15%,transparent);color:var(--red)}
+  .meta-row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+  .meta{font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--border);color:var(--muted)}
+
+  .method{border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin:10px 0;background:var(--surface2)}
+  .method.best{border-color:var(--accent)}
+  .method .mhead{display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:var(--muted);font-weight:600}
+  .method .mhead .best-tag{color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:1px 8px;font-size:11px}
+  .cmdrow{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:10px 12px}
+  .cmdrow .cmd{flex:1;font-size:15px;overflow-x:auto;white-space:nowrap}
+  .copybtn{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:8px;padding:6px 11px;font-size:13px;cursor:pointer;flex:none;font-family:inherit}
+  .copybtn:hover{border-color:var(--accent)}
+  .copybtn.done{border-color:var(--green);color:var(--green)}
+  .gpath{font-size:14px;line-height:1.7}
+  .gpath .step{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:2px 8px;margin:0 2px;display:inline-block}
+
+  .block{margin-top:16px}
+  .block h4{margin:0 0 6px;font-size:13px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:6px}
+  .block .txt{font-size:14px}
+  .okbox{border-inline-start:3px solid var(--green);padding:8px 12px;background:color-mix(in srgb,var(--green) 8%,transparent);border-radius:0 8px 8px 0}
+  .errbox{border-inline-start:3px solid var(--red);padding:8px 12px;background:color-mix(in srgb,var(--red) 8%,transparent);border-radius:0 8px 8px 0;margin-bottom:6px}
+  .warnbox{border-inline-start:3px solid var(--yellow);padding:8px 12px;background:color-mix(in srgb,var(--yellow) 8%,transparent);border-radius:0 8px 8px 0}
+  a.src{color:var(--accent);font-size:13px;text-decoration:none}
+  a.src:hover{text-decoration:underline}
+  .favbtn{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:0 4px}
+  .favbtn.on{color:var(--accent)}
+
+  /* Troubleshoot flow */
+  .tstep{border:1px solid var(--border);background:var(--surface);border-radius:12px;padding:16px;margin-bottom:10px;position:relative}
+  .tstep .num{position:absolute;inset-inline-start:-1px;top:-1px;background:var(--accent);color:var(--accent-ink);font-weight:800;font-size:13px;width:28px;height:28px;border-radius:12px 0 12px 0;display:flex;align-items:center;justify-content:center}
+  .tstep .do{font-size:15px;font-weight:600;margin:2px 0 10px;padding-inline-start:24px}
+  .tstep .check{font-size:13px;color:var(--muted);margin-top:10px;padding-inline-start:6px;border-inline-start:2px solid var(--border)}
+
+  /* Setup / modal */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px}
+  .sheet{background:var(--surface);border:1px solid var(--border);border-radius:18px;max-width:520px;width:100%;max-height:92vh;overflow:auto;padding:24px}
+  .sheet h2{margin:0 0 4px;font-size:22px}
+  .sheet .lead{color:var(--muted);font-size:14px;margin:0 0 20px}
+  .choice-lbl{font-size:13px;color:var(--muted);font-weight:600;margin:18px 0 8px}
+  .choices{display:flex;flex-wrap:wrap;gap:8px}
+  .choice{border:1px solid var(--border);background:var(--surface2);color:var(--text);padding:9px 15px;border-radius:10px;cursor:pointer;font-size:14px;font-family:inherit;transition:.12s}
+  .choice:hover{border-color:var(--accent)}
+  .choice.sel{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+  .choice.legacy{opacity:.85}
+  .hint{font-size:12px;color:var(--muted);margin-top:8px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 12px;display:none}
+  .hint.show{display:block}
+  .hint .mono{color:var(--accent)}
+  .sheet .foot{margin-top:24px;display:flex;gap:10px}
+
+  .theme-swatches{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .sw{width:42px;height:42px;border-radius:11px;cursor:pointer;border:2px solid transparent;position:relative}
+  .sw.on{border-color:var(--text)}
+  .empty{color:var(--muted);text-align:center;padding:40px 0;font-size:15px}
+  .footer{text-align:center;color:var(--muted);font-size:12px;padding:30px 0 10px}
+  .footer b{color:var(--accent)}
+  .about p{font-size:14px;line-height:1.7}
+  .about .card{border:1px solid var(--border);background:var(--surface2);border-radius:12px;padding:14px 16px;font-size:13px;margin:12px 0}
+  .about .card div{margin:3px 0;color:var(--muted)}
+  .about .card b{color:var(--text)}
+  .disc{font-size:12px;color:var(--muted);border:1px solid var(--yellow);border-radius:10px;padding:12px 14px;margin-top:14px;background:color-mix(in srgb,var(--yellow) 6%,transparent)}
+</style>
+</head>
+<body>
+<header>
+  <div class="hbar">
+    <div class="brand" onclick="go('home')"><span class="dot"></span><span id="brandName">מדריך המחשב</span></div>
+    <div class="spacer"></div>
+    <div class="pcchip" id="pcChip" onclick="openSetup()" title="המחשב שלי"></div>
+    <button class="iconbtn" onclick="openThemes()" title="ערכת צבע">🎨</button>
+    <button class="iconbtn" onclick="go('about')" title="אודות">ℹ️</button>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+<div id="modal"></div>
+
+<script>
+/* ============================ STORAGE SHIM ============================ */
+const store=(()=>{let mem={};try{const k='__t';localStorage.setItem(k,'1');localStorage.removeItem(k);
+  return{get:k=>localStorage.getItem(k),set:(k,v)=>localStorage.setItem(k,v),del:k=>localStorage.removeItem(k)};}
+  catch(e){return{get:k=>k in mem?mem[k]:null,set:(k,v)=>mem[k]=String(v),del:k=>delete mem[k]};}})();
+const APP_VERSION="1.0.0";
+
+/* ============================ i18n (UI) ============================ */
+const LANG={
+ he:{brand:"מדריך המחשב",heroTitle:"הפקודות והקיצורים של Windows — במקום אחד",
+   heroSub:"חיפוש, הסבר בעברית, ורמת סיכון לכל פעולה. עובד גם בלי אינטרנט.",
+   searchPh:"חפש פעולה, פקודה או תקלה…",troubleHead:"יש לי בעיה — עזור לי",
+   catsHead:"קטגוריות",search_results:"תוצאות חיפוש",noResults:"לא נמצאו תוצאות. נסה מילה אחרת.",
+   back:"⟵ חזרה",backHome:"⟵ דף הבית",best:"הכי מהיר",copy:"העתק",copied:"הועתק ✓",
+   admin:"דורש מנהל",notSupported:"לא נתמך ב-",riskGreen:"סיכון נמוך — מציג מידע בלבד",
+   riskYellow:"סיכון בינוני — משנה הגדרות / מריץ תיקון",riskRed:"סיכון גבוה — עלול למחוק או לשבור. קרא לפני שמריצים",
+   before:"לפני שמריצים",expectedOk:"תוצאה תקינה",onError:"אם קיבלת שגיאה",undo:"איך מבטלים",source:"מקור רשמי",
+   admins:"הרשאות מנהל",archNote:"הערה לפי ארכיטקטורה",universal:"דרך אוניברסלית (בכל שפה)",
+   myPc:"המחשב שלי",aboutTitle:"אודות",favs:"מועדפים",noFavs:"עדיין אין מועדפים. לחץ ⭐ על פעולה כדי לשמור אותה כאן.",
+   allCmds:"כל הפקודות",setupTitle:"בוא נתאים את המדריך למחשב שלך",
+   setupLead:"נשמור את זה כדי להראות לך בדיוק את הדרך שמתאימה למחשב שלך. אפשר לשנות בכל רגע.",
+   uiLangL:"שפת התצוגה של האפליקציה",winVerL:"גרסת Windows",sysLangL:"שפת המערכת של Windows (לשמות הכפתורים)",
+   archL:"ארכיטקטורה",dontKnow:"לא יודע איזו גרסה יש לי",dontKnowArch:"לא יודע 32 או 64",
+   verHint:"פתח את חלון ההפעלה עם <span class='mono'>Win + R</span>, הקלד <span class='mono'>winver</span> ולחץ Enter — הגרסה תופיע.",
+   archHint:"לחץ <span class='mono'>Win + Pause</span> או פתח הגדרות ← מערכת ← אודות, ותראה 'מערכת 64 סיביות' או '32 סיביות'.",
+   save:"שמור והתחל",skip:"דלג (Windows 11 · עברית · 64-bit)",themesTitle:"ערכת צבע",
+   legacy:"Windows ישן (Legacy) — כבר לא נתמך אבטחתית, שימושי לטכנאים",
+   waysHead:"דרכים לבצע",tryFlow:"עקוב אחרי השלבים לפי הסדר. אם שלב פתר את הבעיה — אפשר לעצור.",
+   disclaimer:"האפליקציה מלמדת ומעתיקה פקודות — היא אינה מריצה כלום בעצמה (הדפדפן חוסם זאת). הפעולות באחריות המשתמש. פקודות המסומנות באדום עלולות לגרום לאובדן מידע — ודא שאתה מבין מה הן עושות לפני הרצה."},
+ en:{brand:"PC Guide",heroTitle:"Every Windows command & shortcut — in one place",
+   heroSub:"Search, plain explanations, and a risk level for every action. Works offline too.",
+   searchPh:"Search an action, command or problem…",troubleHead:"I have a problem — help me",
+   catsHead:"Categories",search_results:"Search results",noResults:"No results. Try another word.",
+   back:"⟵ Back",backHome:"⟵ Home",best:"Fastest",copy:"Copy",copied:"Copied ✓",
+   admin:"Admin",notSupported:"Not in ",riskGreen:"Low risk — shows information only",
+   riskYellow:"Medium risk — changes settings / runs a repair",riskRed:"High risk — may delete or break things. Read before running",
+   before:"Before you run",expectedOk:"Expected result",onError:"If you get an error",undo:"How to undo",source:"Official source",
+   admins:"Admin rights",archNote:"Architecture note",universal:"Universal way (any language)",
+   myPc:"My PC",aboutTitle:"About",favs:"Favorites",noFavs:"No favorites yet. Tap ⭐ on an action to save it here.",
+   allCmds:"All commands",setupTitle:"Let's tailor the guide to your PC",
+   setupLead:"We save this to show you exactly the path that fits your machine. You can change it anytime.",
+   uiLangL:"App display language",winVerL:"Windows version",sysLangL:"Windows system language (for button names)",
+   archL:"Architecture",dontKnow:"I don't know my version",dontKnowArch:"Not sure 32 or 64",
+   verHint:"Open Run with <span class='mono'>Win + R</span>, type <span class='mono'>winver</span> and press Enter — the version appears.",
+   archHint:"Press <span class='mono'>Win + Pause</span> or open Settings → System → About; it shows '64-bit' or '32-bit'.",
+   save:"Save & start",skip:"Skip (Windows 11 · English · 64-bit)",themesTitle:"Color theme",
+   legacy:"Legacy Windows — no longer security-supported, handy for technicians",
+   waysHead:"Ways to do it",tryFlow:"Follow the steps in order. If a step fixes it — you can stop.",
+   disclaimer:"This app teaches and copies commands — it never runs anything itself (the browser blocks that). Actions are at your own risk. Commands marked red may cause data loss — be sure you understand them before running."}
+};
+let P={uiLang:"he",winVer:"win11",sysLang:"he",arch:"x64"};
+const T=k=>{const l=LANG[P.uiLang]||LANG.he;return (l[k]!=null?l[k]:(LANG.en[k]||k));};
+const L=o=>!o?"":(o[P.uiLang]!=null?o[P.uiLang]:(o.en||o.he||""));
+
+const VERS=[["xp","XP"],["vista","Vista"],["win7","7"],["win8","8"],["win81","8.1"],["win10","10"],["win11","11"]];
+const LEGACY=["xp","vista","win7","win8","win81"];
+const verLabel=v=>{const f=VERS.find(x=>x[0]===v);return f?"Windows "+f[1]:v;};
+
+/* ============================ CATEGORIES ============================ */
+const CATS=[
+ {id:"troubleshoot",he:"תיקון תקלות",en:"Troubleshooting",em:"🛠️"},
+ {id:"network",he:"רשת ואינטרנט",en:"Network",em:"🌐"},
+ {id:"system",he:"מערכת ותהליכים",en:"System",em:"🖥️"},
+ {id:"disk",he:"דיסק ואחסון",en:"Disk & Storage",em:"💾"},
+ {id:"cleanup",he:"ניקוי ותחזוקה",en:"Cleanup",em:"🧹"},
+ {id:"security",he:"אבטחה ופרטיות",en:"Security",em:"🔐"},
+ {id:"shortcuts",he:"קיצורי מקשים",en:"Shortcuts",em:"⌨️"},
+];
+
+/* ============================ DATA ============================ */
+/* compat values: yes / partial / no  (missing => no) */
+const Y={xp:"yes",vista:"yes",win7:"yes",win8:"yes",win81:"yes",win10:"yes",win11:"yes"};
+const FROM7={win7:"yes",win8:"yes",win81:"yes",win10:"yes",win11:"yes"};
+const FROM8={win8:"yes",win81:"yes",win10:"yes",win11:"yes"};
+const FROM10={win10:"yes",win11:"yes"};
+
+const ITEMS=[
+/* ---------- SYSTEM ---------- */
+{id:"sys-taskmgr",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"מנהל המשימות",en:"Task Manager"},
+ desc:{he:"מציג תהליכים וביצועים, ומאפשר לסגור תוכנה תקועה.",en:"Shows processes & performance; end a stuck program."},
+ kw:{he:["מנהל משימות","תהליכים","לסגור תוכנה","תקוע","נתקע"],en:["task manager","processes","end task","frozen","stuck"]},
+ methods:[
+  {type:"shortcut",value:"Ctrl + Shift + Esc",best:true,compat:{vista:"yes",win7:"yes",win8:"yes",win81:"yes",win10:"yes",win11:"yes"}},
+  {type:"run",value:"taskmgr",compat:Y},
+  {type:"gui",paths:{
+    xp:{he:"Ctrl + Alt + Delete ← מנהל המשימות",en:"Ctrl + Alt + Delete → Task Manager"},
+    win7:{he:"קליק ימני על שורת המשימות ← הפעל את מנהל המשימות",en:"Right-click taskbar → Start Task Manager"},
+    win10:{he:"קליק ימני על שורת המשימות ← מנהל המשימות",en:"Right-click taskbar → Task Manager"},
+    win11:{he:"קליק ימני על כפתור התחל ← מנהל המשימות",en:"Right-click Start → Task Manager"}},compat:Y}],
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sys-devmgmt",cat:"system",risk:"yellow",admin:false,compat:Y,
+ title:{he:"מנהל ההתקנים",en:"Device Manager"},
+ desc:{he:"רואה חומרה ומנהלי התקנים; שימושי לבעיות דרייברים.",en:"View hardware & drivers; useful for driver problems."},
+ kw:{he:["מנהל התקנים","דרייבר","חומרה","כרטיס מסך","דרייברים"],en:["device manager","driver","hardware","gpu"]},
+ methods:[
+  {type:"run",value:"devmgmt.msc",best:true,compat:Y},
+  {type:"gui",paths:{
+    win7:{he:"לוח הבקרה ← מערכת ← מנהל ההתקנים",en:"Control Panel → System → Device Manager"},
+    win10:{he:"קליק ימני על התחל ← מנהל ההתקנים",en:"Right-click Start → Device Manager"},
+    win11:{he:"קליק ימני על התחל ← מנהל ההתקנים",en:"Right-click Start → Device Manager"}},compat:FROM7}],
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sys-msinfo",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"פרטי המערכת",en:"System Information"},
+ desc:{he:"מציג מפרט מלא: מעבד, זיכרון, גרסה, לוח אם ועוד.",en:"Full spec: CPU, RAM, version, motherboard and more."},
+ kw:{he:["פרטי מערכת","מפרט","זיכרון","מעבד","msinfo"],en:["system info","spec","ram","cpu","msinfo32"]},
+ methods:[{type:"run",value:"msinfo32",best:true,compat:Y}],
+ archNote:{he:"בשורת 'סוג מערכת' תראה x64-based PC (64-bit) או x86-based PC (32-bit).",en:"'System Type' shows x64-based PC (64-bit) or x86-based PC (32-bit)."},
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sys-winver",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"איזו גרסת Windows יש לי",en:"Which Windows version"},
+ desc:{he:"פותח חלון קטן עם גרסת Windows המדויקת ומספר ה-Build.",en:"Opens a small window with your exact Windows version & build."},
+ kw:{he:["גרסה","winver","איזה windows","build"],en:["version","winver","which windows","build"]},
+ methods:[{type:"run",value:"winver",best:true,compat:Y}],
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sys-services",cat:"system",risk:"yellow",admin:true,compat:Y,reversible:true,
+ title:{he:"שירותים (Services)",en:"Services"},
+ desc:{he:"הפעלה/עצירה של שירותי רקע של Windows ותוכנות.",en:"Start/stop Windows and app background services."},
+ kw:{he:["שירותים","services","רקע","להפעיל שירות"],en:["services","background","start service"]},
+ methods:[{type:"run",value:"services.msc",best:true,compat:Y}],
+ before:{he:"אל תשבית שירותים שאינך מזהה — חלקם קריטיים לאתחול.",en:"Don't disable services you don't recognize — some are boot-critical."},
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"sys-msconfig",cat:"system",risk:"yellow",admin:true,compat:Y,reversible:true,
+ title:{he:"הגדרת אתחול (msconfig)",en:"System Configuration (msconfig)"},
+ desc:{he:"שולט באתחול, שירותים ומצב בטוח.",en:"Controls startup, services and Safe Boot."},
+ kw:{he:["msconfig","אתחול","מצב בטוח","safe mode","הפעלה"],en:["msconfig","startup","safe mode","boot"]},
+ methods:[{type:"run",value:"msconfig",best:true,compat:Y}],
+ before:{he:"שינוי לשונית 'אתחול' (Boot) יכול למנוע עלייה תקינה. סמן/בטל בזהירות.",en:"Changing the Boot tab can stop Windows loading. Use with care."},
+ undo:{he:"אם המערכת לא עולה טוב — חזור ל-msconfig ובחר 'הפעלה רגילה' (Normal startup).",en:"If boot misbehaves — reopen msconfig and pick 'Normal startup'."},
+ source:"https://learn.microsoft.com/windows/"},
+
+/* ---------- NETWORK ---------- */
+{id:"net-ipconfig",cat:"network",risk:"green",admin:false,compat:Y,
+ title:{he:"בדיקת כתובת IP והרשת",en:"Check IP & network"},
+ desc:{he:"מציג כתובת IP, שער ברירת מחדל ושרתי DNS — הבדיקה הראשונה בכל תקלת רשת.",en:"Shows IP, gateway and DNS — the first check for any network issue."},
+ kw:{he:["ip","כתובת","רשת","ipconfig","dns","שער","גייטוויי"],en:["ip","address","network","ipconfig","dns","gateway"]},
+ methods:[
+  {type:"cmd",value:"ipconfig /all",best:true,compat:Y},
+  {type:"cmd",value:"ipconfig",compat:Y}],
+ expectedOk:{he:"אם ליד 'IPv4 Address' יש כתובת אמיתית (למשל 192.168.x.x) — יש חיבור לרשת המקומית.",en:"A real IPv4 (e.g. 192.168.x.x) means you're on the local network."},
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/ipconfig"},
+
+{id:"net-ping",cat:"network",risk:"green",admin:false,compat:Y,
+ title:{he:"בדיקת חיבור (ping)",en:"Test connection (ping)"},
+ desc:{he:"בודק אם יש חיבור ליעד. ping לשרת חיצוני בודק שהאינטרנט עצמו עובד.",en:"Checks reachability. Pinging an external server tests the internet itself."},
+ kw:{he:["ping","פינג","חיבור","אינטרנט לא עובד","בדיקת רשת"],en:["ping","connection","internet down"]},
+ methods:[
+  {type:"cmd",value:"ping 8.8.8.8",best:true,compat:Y},
+  {type:"cmd",value:"ping google.com",compat:Y}],
+ expectedOk:{he:"'Reply from…' עם זמן במילישניות = יש חיבור. אם ping ל-8.8.8.8 עובד אבל ל-google.com לא — הבעיה ב-DNS.",en:"'Reply from…' with ms = connected. If 8.8.8.8 works but google.com doesn't — it's a DNS issue."},
+ onError:[{when:{he:"Request timed out / Destination host unreachable",en:"Request timed out / unreachable"},fix:{he:"אין חיבור ליעד — בדוק כבל/Wi-Fi, אתחל ראוטר, ונסה ipconfig.",en:"No route — check cable/Wi-Fi, restart router, run ipconfig."}}],
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/ping"},
+
+{id:"net-flushdns",cat:"network",risk:"yellow",admin:true,compat:Y,reversible:true,
+ title:{he:"ניקוי מטמון DNS",en:"Flush DNS cache"},
+ desc:{he:"מנקה זיכרון תרגום כתובות; עוזר כשאתרים לא נטענים או מובילים למקום שגוי.",en:"Clears the address cache; fixes sites not loading or resolving wrong."},
+ kw:{he:["dns","flush","מטמון","אתר לא נטען","ניקוי dns"],en:["dns","flush","cache","site won't load"]},
+ methods:[{type:"cmd",value:"ipconfig /flushdns",best:true,compat:Y}],
+ expectedOk:{he:"'Successfully flushed the DNS Resolver Cache'.",en:"'Successfully flushed the DNS Resolver Cache'."},
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/ipconfig"},
+
+{id:"net-reset",cat:"network",risk:"yellow",admin:true,compat:FROM7,reversible:false,
+ title:{he:"איפוס מחסנית הרשת",en:"Reset network stack"},
+ desc:{he:"מאפס Winsock ו-TCP/IP כשהרשת 'תקועה' אחרי שכל השאר נכשל. דורש אתחול.",en:"Resets Winsock & TCP/IP when networking is stuck. Needs a restart."},
+ kw:{he:["winsock","tcp","איפוס רשת","reset","הרשת תקועה"],en:["winsock","tcp/ip","network reset"]},
+ methods:[
+  {type:"cmd",value:"netsh winsock reset",best:true,compat:FROM7},
+  {type:"cmd",value:"netsh int ip reset",compat:FROM7}],
+ before:{he:"הרץ רק כשצעדים פשוטים יותר נכשלו. אתחל את המחשב אחרי כן.",en:"Only after simpler steps failed. Restart the PC afterwards."},
+ undo:{he:"אין ביטול ישיר; הגדרות רשת מותאמות-אישית יתאפסו לברירת מחדל.",en:"No direct undo; custom network settings revert to defaults."},
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/netsh"},
+
+/* ---------- DISK ---------- */
+{id:"disk-cleanmgr",cat:"disk",risk:"yellow",admin:false,compat:Y,
+ title:{he:"ניקוי דיסק (Disk Cleanup)",en:"Disk Cleanup"},
+ desc:{he:"מוחק קבצים זמניים, מטמון עדכונים והתקנות Windows ישנות כדי לפנות מקום.",en:"Removes temp files, update cache and old Windows installs to free space."},
+ kw:{he:["ניקוי דיסק","מקום","cleanmgr","קבצים זמניים","דיסק מלא"],en:["disk cleanup","free space","cleanmgr","temp"]},
+ methods:[{type:"run",value:"cleanmgr",best:true,compat:Y}],
+ before:{he:"עבור על הרשימה לפני האישור. 'Downloads' (אם מופיע) ימחק את כל תיקיית ההורדות.",en:"Review the list first. 'Downloads' (if listed) deletes your whole Downloads folder."},
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"disk-chkdsk",cat:"disk",risk:"red",admin:true,compat:Y,reversible:false,
+ title:{he:"בדיקת דיסק (chkdsk)",en:"Check Disk (chkdsk)"},
+ desc:{he:"סורק ומתקן שגיאות במערכת הקבצים ובסקטורים פגומים.",en:"Scans and repairs file-system errors and bad sectors."},
+ kw:{he:["chkdsk","דיסק פגום","סקטורים","בדיקת כונן","תיקון דיסק"],en:["chkdsk","bad sectors","disk repair"]},
+ methods:[{type:"cmd",value:"chkdsk C: /f /r",best:true,compat:Y}],
+ before:{he:"סורק לרוב בעת אתחול וחוסם את הכונן לזמן רב. גבה מידע חשוב מראש. /r על דיסק פגום עלול לקחת שעות.",en:"Usually runs at boot and locks the drive for a long time. Back up important data first. /r on a failing disk can take hours."},
+ expectedOk:{he:"'Windows has scanned the file system and found no problems'.",en:"'…found no problems'."},
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/chkdsk"},
+
+{id:"disk-mgmt",cat:"disk",risk:"red",admin:true,compat:FROM7,
+ title:{he:"ניהול דיסקים",en:"Disk Management"},
+ desc:{he:"יצירה, מחיקה, כיווץ והרחבה של מחיצות.",en:"Create, delete, shrink and extend partitions."},
+ kw:{he:["מחיצות","partition","ניהול דיסקים","diskmgmt","פרמוט"],en:["partition","disk management","diskmgmt","format"]},
+ methods:[{type:"run",value:"diskmgmt.msc",best:true,compat:FROM7}],
+ before:{he:"מחיקה או פרמוט של מחיצה מוחקים את כל המידע עליה — לצמיתות. ודא שאתה על הכונן הנכון.",en:"Deleting or formatting a partition erases all its data — permanently. Confirm the correct drive."},
+ source:"https://learn.microsoft.com/windows/"},
+
+/* ---------- CLEANUP ---------- */
+{id:"clean-temp",cat:"cleanup",risk:"green",admin:false,compat:FROM7,
+ title:{he:"פתיחת תיקיית קבצים זמניים",en:"Open Temp folder"},
+ desc:{he:"פותח את תיקיית ה-TEMP; אפשר לבחור הכל ולמחוק (קבצים בשימוש פשוט ידלגו).",en:"Opens the TEMP folder; select all and delete (in-use files just skip)."},
+ kw:{he:["temp","זמניים","ניקוי","מקום"],en:["temp","temporary","cleanup"]},
+ methods:[{type:"run",value:"%temp%",best:true,compat:FROM7}],
+ source:"https://learn.microsoft.com/windows/"},
+
+{id:"clean-storagesense",cat:"cleanup",risk:"green",admin:false,compat:FROM10,
+ title:{he:"חיישן אחסון (Storage Sense)",en:"Storage Sense"},
+ desc:{he:"מנקה אוטומטית קבצים זמניים וסל מיחזור כשהכונן מתמלא.",en:"Auto-cleans temp files & recycle bin as the drive fills up."},
+ kw:{he:["storage sense","חיישן אחסון","ניקוי אוטומטי"],en:["storage sense","auto clean"]},
+ methods:[{type:"gui",paths:{
+    win10:{he:"הגדרות ← מערכת ← אחסון ← חיישן אחסון",en:"Settings → System → Storage → Storage Sense"},
+    win11:{he:"הגדרות ← מערכת ← אחסון ← חיישן אחסון",en:"Settings → System → Storage → Storage Sense"}},compat:FROM10}],
+ before:{he:"בהגדרות תיקיית Downloads שמוחקת לפי גיל — השאר על 'לעולם לא' אם היא ארכיון עבורך.",en:"For the Downloads 'delete by age' setting — keep it 'Never' if it's your archive."},
+ source:"https://learn.microsoft.com/windows/"},
+
+/* ---------- TROUBLESHOOT ---------- */
+{id:"diag-sfc",cat:"troubleshoot",risk:"yellow",admin:true,compat:Y,reversible:true,
+ title:{he:"בדיקת קבצי מערכת (SFC)",en:"System File Check (SFC)"},
+ desc:{he:"סורק קבצי מערכת ומחליף פגומים בעותק תקין — פותר הרבה תקלות מסתוריות.",en:"Scans system files and replaces corrupted ones — fixes many mystery bugs."},
+ kw:{he:["sfc","קבצים פגומים","תיקון מערכת","שגיאות מוזרות","scannow"],en:["sfc","corrupt files","repair","scannow"]},
+ methods:[
+  {type:"cmd",value:"sfc /scannow",best:true,compat:Y},
+  {type:"powershell",value:"sfc /scannow",compat:FROM7}],
+ before:{he:"10–20 דקות. לא נוגע בקבצים או בתוכנות שלך. יש לפתוח שורת פקודה כמנהל.",en:"10–20 min. Doesn't touch your files or apps. Run the terminal as admin."},
+ expectedOk:{he:"'Windows Resource Protection did not find any integrity violations' = הקבצים שלמים.",en:"'…did not find any integrity violations' = files intact."},
+ onError:[{when:{he:"נכשל / לא הצליח לתקן חלק מהקבצים",en:"Failed / couldn't repair some files"},fix:{he:"הרץ קודם DISM (הכרטיס הבא) ואז שוב sfc /scannow.",en:"Run DISM (next card) first, then sfc /scannow again."}}],
+ source:"https://learn.microsoft.com/windows-server/administration/windows-commands/sfc"},
+
+{id:"diag-dism",cat:"troubleshoot",risk:"yellow",admin:true,compat:FROM8,reversible:true,
+ title:{he:"תיקון תמונת המערכת (DISM)",en:"Repair system image (DISM)"},
+ desc:{he:"מתקן את העותק הנקי שממנו SFC משחזר — כשה-SFC עצמו נכשל.",en:"Repairs the clean image SFC restores from — when SFC itself fails."},
+ kw:{he:["dism","תיקון","restorehealth","sfc נכשל"],en:["dism","restorehealth","repair image"]},
+ methods:[{type:"cmd",value:"DISM /Online /Cleanup-Image /RestoreHealth",best:true,compat:FROM8},
+  {type:"powershell",value:"Repair-WindowsImage -Online -RestoreHealth",compat:FROM8}],
+ before:{he:"דורש אינטרנט (מוריד קבצים תקינים). כמה דקות עד רבע שעה.",en:"Needs internet (downloads healthy files). A few to ~15 minutes."},
+ expectedOk:{he:"'The restore operation completed successfully'. אחר כך הרץ שוב sfc /scannow.",en:"'The restore operation completed successfully'. Then run sfc /scannow again."},
+ source:"https://learn.microsoft.com/windows-hardware/manufacture/desktop/repair-a-windows-image"},
+
+/* ---------- SECURITY ---------- */
+{id:"sec-defenderscan",cat:"security",risk:"green",admin:false,compat:FROM10,
+ title:{he:"סריקת וירוסים (Defender)",en:"Virus scan (Defender)"},
+ desc:{he:"מריץ סריקת מערכת עם ההגנה המובנית של Windows.",en:"Runs a scan with Windows' built-in protection."},
+ kw:{he:["וירוס","סריקה","defender","נוזקה","אנטי וירוס"],en:["virus","scan","defender","malware","antivirus"]},
+ methods:[{type:"gui",paths:{
+    win10:{he:"אבטחת Windows ← הגנה מפני וירוסים ← אפשרויות סריקה",en:"Windows Security → Virus & threat protection → Scan options"},
+    win11:{he:"אבטחת Windows ← הגנה מפני וירוסים ← אפשרויות סריקה",en:"Windows Security → Virus & threat protection → Scan options"}},compat:FROM10}],
+ source:"https://learn.microsoft.com/windows/security/"},
+
+{id:"sec-offline",cat:"security",risk:"yellow",admin:true,compat:FROM10,
+ title:{he:"סריקה לפני עליית המערכת (Offline scan)",en:"Microsoft Defender Offline scan"},
+ desc:{he:"סורק בסביבה נפרדת לפני שהמערכת עולה — תופס נוזקות שמתחבאות בזמן ריצה.",en:"Scans before Windows loads — catches malware that hides while running."},
+ kw:{he:["offline scan","וירוס מתחבא","סריקה לפני אתחול"],en:["offline scan","hidden malware","boot scan"]},
+ methods:[{type:"gui",paths:{
+    win10:{he:"אבטחת Windows ← הגנה מפני וירוסים ← אפשרויות סריקה ← Microsoft Defender Offline scan",en:"Windows Security → Virus & threat protection → Scan options → Microsoft Defender Offline scan"},
+    win11:{he:"אבטחת Windows ← הגנה מפני וירוסים ← אפשרויות סריקה ← Microsoft Defender Offline scan",en:"Windows Security → Virus & threat protection → Scan options → Microsoft Defender Offline scan"}},compat:FROM10}],
+ before:{he:"המחשב יתאתחל מיד ויהיה מושבת ~15 דקות. שמור קבצים פתוחים קודם.",en:"The PC restarts immediately and is unavailable ~15 min. Save open files first."},
+ source:"https://learn.microsoft.com/windows/security/"},
+
+{id:"sec-controlled",cat:"security",risk:"yellow",admin:true,compat:FROM10,reversible:true,
+ title:{he:"הגנה מפני כופרה (Controlled folder access)",en:"Ransomware protection"},
+ desc:{he:"חוסם אפליקציות לא מאושרות מלשנות קבצים בתיקיות מוגנות.",en:"Blocks unapproved apps from changing files in protected folders."},
+ kw:{he:["כופרה","ransomware","הגנת תיקיות","controlled folder"],en:["ransomware","controlled folder access","protect"]},
+ methods:[{type:"gui",paths:{
+    win10:{he:"אבטחת Windows ← הגנה מפני וירוסים ← הגנה מפני כופרה",en:"Windows Security → Virus & threat protection → Ransomware protection"},
+    win11:{he:"אבטחת Windows ← הגנה מפני וירוסים ← הגנה מפני כופרה",en:"Windows Security → Virus & threat protection → Ransomware protection"}},compat:FROM10}],
+ before:{he:"בשבועיים הראשונים תחסום גם תוכנות לגיטימיות — תצטרך לאשר אותן ידנית ב-'Allow an app'.",en:"For the first weeks it also blocks legit apps — approve them manually under 'Allow an app'."},
+ undo:{he:"אפשר לכבות באותו מסך אם זה מפריע.",en:"Turn it off in the same screen if it gets in the way."},
+ source:"https://learn.microsoft.com/windows/security/"},
+
+/* ---------- SHORTCUTS ---------- */
+{id:"sc-run",cat:"shortcuts",risk:"green",admin:false,compat:Y,
+ title:{he:"חלון הפעלה (Run)",en:"Run dialog"},
+ desc:{he:"פותח את חלון ההפעלה להרצת פקודות קצרות כמו devmgmt.msc.",en:"Opens Run to launch quick commands like devmgmt.msc."},
+ kw:{he:["run","הפעלה","win r","חלון הרצה"],en:["run","win+r","launch"]},
+ methods:[{type:"shortcut",value:"Win + R",best:true,compat:Y}]},
+{id:"sc-explorer",cat:"shortcuts",risk:"green",admin:false,compat:FROM7,
+ title:{he:"פתיחת סייר הקבצים",en:"Open File Explorer"},
+ desc:{he:"פותח את חלון הקבצים.",en:"Opens the file window."},
+ kw:{he:["סייר","קבצים","explorer","win e"],en:["explorer","files","win+e"]},
+ methods:[{type:"shortcut",value:"Win + E",best:true,compat:FROM7}]},
+{id:"sc-settings",cat:"shortcuts",risk:"green",admin:false,compat:FROM10,
+ title:{he:"פתיחת ההגדרות",en:"Open Settings"},
+ desc:{he:"פותח את אפליקציית ההגדרות של Windows.",en:"Opens the Windows Settings app."},
+ kw:{he:["הגדרות","settings","win i"],en:["settings","win+i"]},
+ methods:[{type:"shortcut",value:"Win + I",best:true,compat:FROM10}]},
+{id:"sc-lock",cat:"shortcuts",risk:"green",admin:false,compat:Y,
+ title:{he:"נעילת המחשב",en:"Lock the PC"},
+ desc:{he:"נועל מיד למסך הכניסה בלי לצאת מהתוכנות.",en:"Instantly locks to the sign-in screen without closing apps."},
+ kw:{he:["נעילה","lock","win l","מסך נעילה"],en:["lock","win+l"]},
+ methods:[{type:"shortcut",value:"Win + L",best:true,compat:Y}]},
+{id:"sc-snip",cat:"shortcuts",risk:"green",admin:false,compat:FROM8,
+ title:{he:"צילום מסך לחיתוך",en:"Screenshot to crop"},
+ desc:{he:"פותח כלי חיתוך לצילום אזור מהמסך.",en:"Opens the snip tool to capture a screen region."},
+ kw:{he:["צילום מסך","snip","חיתוך","screenshot"],en:["screenshot","snip","capture"]},
+ methods:[
+  {type:"shortcut",value:"Win + Shift + S",best:true,compat:FROM10},
+  {type:"shortcut",value:"Print Screen",compat:Y}]},
+{id:"sc-desktop",cat:"shortcuts",risk:"green",admin:false,compat:Y,
+ title:{he:"הצג את שולחן העבודה",en:"Show desktop"},
+ desc:{he:"ממזער את כל החלונות ומראה את שולחן העבודה (שוב מחזיר).",en:"Minimizes all windows to show the desktop (again restores)."},
+ kw:{he:["שולחן עבודה","win d","למזער הכל"],en:["desktop","win+d","minimize all"]},
+ methods:[{type:"shortcut",value:"Win + D",best:true,compat:Y}]},
+{id:"sc-vdesk",cat:"shortcuts",risk:"green",admin:false,compat:FROM10,
+ title:{he:"שולחנות עבודה וירטואליים",en:"Virtual desktops"},
+ desc:{he:"פותח תצוגת משימות למעבר בין שולחנות עבודה.",en:"Opens Task View to switch virtual desktops."},
+ kw:{he:["שולחנות עבודה","virtual desktop","task view","win tab"],en:["virtual desktop","task view","win+tab"]},
+ methods:[
+  {type:"shortcut",value:"Win + Tab",best:true,compat:FROM10},
+  {type:"shortcut",value:"Ctrl + Win + D",compat:FROM10}]},
+];
+
+/* ---------- Architecture-relevant reference cards ---------- */
+ITEMS.push(
+{id:"sys-progfiles",cat:"system",risk:"green",admin:false,compat:Y,
+ title:{he:"היכן נמצאות התוכנות (Program Files)",en:"Where programs live (Program Files)"},
+ desc:{he:"פותח את תיקיית התוכנות. במחשב 64-bit יש שתי תיקיות; במחשב 32-bit רק אחת.",en:"Opens the programs folder. 64-bit PCs have two; 32-bit have one."},
+ kw:{he:["program files","תוכנות","x86","64 bit","32 bit"],en:["program files","x86","64-bit","32-bit"]},
+ methods:[{type:"run",value:"%ProgramFiles%",best:true,compat:Y}],
+ archNote:{he:"במחשב 64-bit: 'Program Files' לתוכנות 64-bit ו-'Program Files (x86)' לתוכנות 32-bit. במחשב 32-bit קיימת רק 'Program Files'.",en:"On 64-bit: 'Program Files' (64-bit apps) and 'Program Files (x86)' (32-bit apps). On 32-bit there's only 'Program Files'."},
+ source:"https://learn.microsoft.com/windows/"});
+
+/* ============================ TROUBLESHOOT TREES ============================ */
+const TREES=[
+ {id:"t-net",cat:"troubleshoot",em:"🌐",
+  title:{he:"האינטרנט לא עובד",en:"Internet isn't working"},
+  intro:{he:"נעבור מהקרוב לרחוק: המחשב → הרשת המקומית → האינטרנט → DNS.",en:"We'll go outward: PC → local network → internet → DNS."},
+  steps:[
+   {do:{he:"בדוק את חיבור הרשת של המחשב.",en:"Check the PC's network connection."},cmd:"ipconfig /all",
+    check:{he:"יש כתובת IPv4 (למשל 192.168.x.x)? אם כן — אתה מחובר לראוטר, המשך. אם 169.254.x.x או ריק — המחשב לא קיבל כתובת: אתחל ראוטר ובדוק כבל/Wi-Fi.",en:"Got an IPv4 (e.g. 192.168.x.x)? Then you reach the router — continue. 169.254.x.x or empty = no address: restart the router, check cable/Wi-Fi."}},
+   {do:{he:"בדוק שהאינטרנט עצמו זמין.",en:"Check the internet itself."},cmd:"ping 8.8.8.8",
+    check:{he:"'Reply from…' = יש אינטרנט, עבור לשלב הבא. 'Request timed out' = הבעיה בין הראוטר לספק — אתחל ראוטר / פנה לספק.",en:"'Reply from…' = internet is up, go on. 'Request timed out' = issue between router and ISP — restart router / call ISP."}},
+   {do:{he:"בדוק אם הבעיה ב-DNS (שמות אתרים).",en:"Check if it's a DNS (site names) issue."},cmd:"ping google.com",
+    check:{he:"אם ping ל-8.8.8.8 עבד אבל ל-google.com נכשל — זה DNS. עבור לשלב הבא.",en:"If 8.8.8.8 worked but google.com failed — it's DNS. Continue."}},
+   {do:{he:"נקה את מטמון ה-DNS.",en:"Flush the DNS cache."},cmd:"ipconfig /flushdns",
+    check:{he:"נסה שוב לגלוש. אם עדיין תקוע — שקול לשנות DNS ל-8.8.8.8 בהגדרות המתאם, או אפס את מחסנית הרשת (חפש 'איפוס מחסנית הרשת').",en:"Try browsing again. Still stuck — set DNS to 8.8.8.8 in the adapter, or reset the network stack (search 'Reset network stack')."}},
+  ]},
+ {id:"t-slow",cat:"troubleshoot",em:"🐢",
+  title:{he:"המחשב איטי",en:"The PC is slow"},
+  intro:{he:"נתחיל במה שהכי לרוב אשם: תוכנות אתחול, מקום בדיסק וקבצים פגומים.",en:"Start with the usual suspects: startup apps, disk space, corrupt files."},
+  steps:[
+   {do:{he:"ראה מה עמוס עכשיו (מעבד/זיכרון/דיסק).",en:"See what's loaded now (CPU/RAM/disk)."},cmd:"taskmgr",
+    check:{he:"בלשונית 'תהליכים' מיין לפי מעבד ואז לפי זיכרון. תהליך שאוכל 100% בעקביות הוא החשוד.",en:"On 'Processes' sort by CPU then Memory. A process pegged near 100% is the suspect."}},
+   {do:{he:"צמצם תוכנות שנטענות באתחול.",en:"Trim startup apps."},cmd:"msconfig",
+    check:{he:"עבור ללשונית 'שירותים' → סמן 'הסתר את כל שירותי Microsoft', ובטל מה שאינך צריך. תוכנות אתחול מנוהלות גם במנהל המשימות → לשונית 'הפעלה'.",en:"Go to 'Services' → tick 'Hide all Microsoft services', disable what you don't need. Startup apps also live in Task Manager → 'Startup'."}},
+   {do:{he:"פנה מקום בדיסק (דיסק מלא מאט מאוד).",en:"Free disk space (a full disk is very slow)."},cmd:"cleanmgr",
+    check:{he:"נקה קבצים זמניים ומטמון עדכונים. שאף לפחות 10–15% פנוי בכונן המערכת.",en:"Clear temp & update cache. Aim for at least 10–15% free on the system drive."}},
+   {do:{he:"בדוק קבצי מערכת פגומים.",en:"Check for corrupt system files."},cmd:"sfc /scannow",
+    check:{he:"אם נמצאו ותוקנו בעיות — אתחל. אם נכשל — הרץ DISM ואז שוב sfc.",en:"If issues were found & fixed — restart. If it failed — run DISM then sfc again."}},
+  ]},
+ {id:"t-errors",cat:"troubleshoot",em:"⚠️",
+  title:{he:"שגיאות מוזרות / משהו נשבר",en:"Weird errors / something broke"},
+  intro:{he:"כשהמערכת מתחילה לזרוק שגיאות בלי סיבה — לרוב זה קבצי מערכת פגומים.",en:"When Windows throws errors for no reason — it's usually corrupt system files."},
+  steps:[
+   {do:{he:"הרץ בדיקת קבצי מערכת.",en:"Run a system file check."},cmd:"sfc /scannow",
+    check:{he:"'did not find any integrity violations' = הקבצים תקינים, הבעיה במקום אחר. נמצאו בעיות → אתחל ובדוק שוב.",en:"'…no integrity violations' = files fine, look elsewhere. Found issues → restart & recheck."}},
+   {do:{he:"אם SFC נכשל — תקן את תמונת המערכת.",en:"If SFC failed — repair the image."},cmd:"DISM /Online /Cleanup-Image /RestoreHealth",
+    check:{he:"אחרי שהסתיים בהצלחה — הרץ שוב sfc /scannow.",en:"After it succeeds — run sfc /scannow again."}},
+   {do:{he:"אם התחיל אחרי התקנה/דרייבר — שקול נקודת שחזור.",en:"If it started after an install/driver — consider System Restore."},cmd:"rstrui",
+    check:{he:"בחר נקודה מלפני שהתקלה התחילה. זה לא נוגע בקבצים האישיים שלך.",en:"Pick a point from before the trouble began. It won't touch your personal files."}},
+  ]},
+];
+
+/* ============================ THEMES ============================ */
+const THEMES=[
+ {id:"gold",he:"שחור-זהב",en:"Black & Gold",c:"#d4af37",bg:"#0a0a0a"},
+ {id:"sapphire",he:"כחול ספיר",en:"Sapphire",c:"#5aa2ff",bg:"#0a0e1a"},
+ {id:"emerald",he:"ירוק אמרלד",en:"Emerald",c:"#37d39b",bg:"#08120d"},
+ {id:"crimson",he:"אדום ארגמן",en:"Crimson",c:"#ff6b6b",bg:"#130808"},
+ {id:"daylight",he:"אור יום (בהיר)",en:"Daylight (light)",c:"#b8860b",bg:"#f2efe7"},
+];
+
+/* ============================ HELPERS ============================ */
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+const app=()=>document.getElementById('app');
+function applyDir(){document.documentElement.lang=P.uiLang;document.documentElement.dir=P.uiLang==="he"?"rtl":"ltr";}
+function saveProfile(){store.set('pcg_profile',JSON.stringify(P));}
+function loadProfile(){try{const r=store.get('pcg_profile');if(r)P=Object.assign(P,JSON.parse(r));}catch(e){}}
+function applyTheme(id){document.documentElement.setAttribute('data-theme',id);store.set('pcg_theme',id);
+  const t=THEMES.find(x=>x.id===id);if(t){const m=document.querySelector('meta[name=theme-color]');if(m)m.content=t.bg;}}
+/* favorites */
+function favs(){try{return JSON.parse(store.get('pcg_favs')||'[]');}catch(e){return[];}}
+function isFav(id){return favs().includes(id);}
+function toggleFav(id){let f=favs();f.includes(id)?f=f.filter(x=>x!==id):f.push(id);store.set('pcg_favs',JSON.stringify(f));}
+
+function compatState(c){if(!c)return"no";return c[P.winVer]||"no";}
+function itemSupported(it){return compatState(it.compat)!=="no";}
+function bestMethods(it){/* methods applicable to current version, best first */
+  const ms=(it.methods||[]).filter(m=>!m.compat||compatState(m.compat)!=="no");
+  return ms.sort((a,b)=>(b.best?1:0)-(a.best?1:0));}
+function guiPath(m){/* resolve gui path for version + sys lang with fallback */
+  if(!m.paths)return null;const order=["win11","win10","win81","win8","win7","vista","xp"];
+  let node=m.paths[P.winVer];
+  if(!node){const i=order.indexOf(P.winVer);for(let j=i+1;j<order.length&&!node;j++)node=m.paths[order[j]];
+    for(let j=i-1;j>=0&&!node;j--)node=m.paths[order[j]];}
+  if(!node)node=Object.values(m.paths)[0];
+  if(!node)return null;return node[P.sysLang]!=null?node[P.sysLang]:(node.en||node.he);}
+
+const METHOD_LABEL={shortcut:{he:"קיצור מקשים",en:"Keyboard shortcut"},run:{he:"חלון הפעלה (Win+R)",en:"Run (Win+R)"},
+ cmd:{he:"שורת פקודה (CMD)",en:"Command Prompt (CMD)"},powershell:{he:"PowerShell",en:"PowerShell"},gui:{he:"דרך התפריטים",en:"Through the menus"}};
+
+/* ============================ ROUTER ============================ */
+let stack=[];
+function go(screen,param){stack.push({screen,param});render(screen,param);window.scrollTo(0,0);}
+function back(){stack.pop();const p=stack[stack.length-1]||{screen:'home'};render(p.screen,p.param);window.scrollTo(0,0);}
+function render(screen,param){
+  document.getElementById('brandName').textContent=T('brand');
+  updateChip();
+  const c=app();c.innerHTML='';
+  if(screen==='home')return renderHome(c);
+  if(screen==='category')return renderCategory(c,param);
+  if(screen==='search')return renderSearch(c,param);
+  if(screen==='item')return renderItem(c,param);
+  if(screen==='tree')return renderTree(c,param);
+  if(screen==='favs')return renderFavs(c);
+  if(screen==='about')return renderAbout(c);
+}
+function updateChip(){const chip=document.getElementById('pcChip');
+  chip.innerHTML=`🖥️ <b>${verLabel(P.winVer).replace('Windows ','Win ')}</b> · ${P.arch==='x64'?'64':'32'}bit`;}
+
+/* ============================ SCREENS ============================ */
+function renderHome(c){
+  const hero=el('div','hero');
+  hero.appendChild(el('h1',null,esc(T('heroTitle'))));
+  hero.appendChild(el('p',null,esc(T('heroSub'))));
+  c.appendChild(hero);
+
+  // search
+  const s=el('div','search');
+  s.innerHTML=`<input id="q" placeholder="${esc(T('searchPh'))}" autocomplete="off"><span class="mag">🔍</span>`;
+  c.appendChild(s);
+  const inp=s.querySelector('#q');
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&inp.value.trim())go('search',inp.value.trim());});
+  inp.addEventListener('input',()=>{if(inp.value.trim().length>=2)go('search',inp.value.trim());});
+
+  // troubleshoot trees
+  c.appendChild(el('div','sectitle',esc(T('troubleHead'))));
+  TREES.forEach(t=>{
+    const d=el('div','troublecard');
+    d.innerHTML=`<span class="em">${t.em}</span><div><h3>${esc(L(t.title))}</h3><p>${esc(L(t.intro))}</p></div>`;
+    d.onclick=()=>go('tree',t.id);c.appendChild(d);
+  });
+
+  // categories
+  c.appendChild(el('div','sectitle',esc(T('catsHead'))));
+  const g=el('div','grid');
+  CATS.forEach(cat=>{
+    const n=(cat.id==='troubleshoot'?TREES.length:0)+ITEMS.filter(i=>i.cat===cat.id).length;
+    const d=el('div','cat');
+    d.innerHTML=`<span class="em">${cat.em}</span><h3>${esc(L(cat))}</h3><span>${n}</span>`;
+    d.onclick=()=>go('category',cat.id);g.appendChild(d);
+  });
+  // favorites tile
+  const fav=el('div','cat');fav.innerHTML=`<span class="em">⭐</span><h3>${esc(T('favs'))}</h3><span>${favs().length}</span>`;
+  fav.onclick=()=>go('favs');g.appendChild(fav);
+  c.appendChild(g);
+
+  c.appendChild(el('div','footer',`AppNest · ${esc(T('brand'))} · v${APP_VERSION} — <b>barakaflalo.github.io/appnest</b>`));
+}
+
+function itemRow(it){
+  const supported=itemSupported(it);
+  const d=el('div','item'+(supported?'':' dim'));
+  const tags=[];
+  if(it.admin)tags.push(`<span class="tag admin">🛡️ ${esc(T('admin'))}</span>`);
+  if(!supported)tags.push(`<span class="tag unsupported">${esc(T('notSupported'))}${esc(verLabel(P.winVer))}</span>`);
+  d.innerHTML=`<span class="risk ${it.risk}"></span><div class="body"><h3>${esc(L(it.title))}</h3><p>${esc(L(it.desc))}</p>${tags.length?`<div class="tags">${tags.join('')}</div>`:''}</div>`;
+  d.onclick=()=>go('item',it.id);return d;
+}
+
+function renderCategory(c,catId){
+  c.appendChild(backBtn());
+  const cat=CATS.find(x=>x.id===catId);
+  const head=el('div','hero');head.innerHTML=`<h1>${cat.em} ${esc(L(cat))}</h1>`;c.appendChild(head);
+  if(catId==='troubleshoot'){
+    TREES.forEach(t=>{const d=el('div','troublecard');
+      d.innerHTML=`<span class="em">${t.em}</span><div><h3>${esc(L(t.title))}</h3><p>${esc(L(t.intro))}</p></div>`;
+      d.onclick=()=>go('tree',t.id);c.appendChild(d);});
+  }
+  const list=ITEMS.filter(i=>i.cat===catId);
+  // supported first
+  list.sort((a,b)=>(itemSupported(b)?1:0)-(itemSupported(a)?1:0));
+  list.forEach(it=>c.appendChild(itemRow(it)));
+  if(!list.length&&catId!=='troubleshoot')c.appendChild(el('div','empty',esc(T('noResults'))));
+}
+
+function searchScore(it,q){
+  const toks=q.toLowerCase().split(/\s+/).filter(Boolean);
+  const hay=[L(it.title),it.title.he,it.title.en,L(it.desc),
+    ...(it.kw?.he||[]),...(it.kw?.en||[]),...(it.methods||[]).map(m=>m.value||'')].join(' ').toLowerCase();
+  let sc=0;toks.forEach(t=>{if(hay.includes(t))sc+=1;});
+  return toks.length&&sc===toks.length?sc:(sc>0?sc*0.5:0);
+}
+function renderSearch(c,q){
+  c.appendChild(backBtn());
+  const s=el('div','search');
+  s.innerHTML=`<input id="q" value="${esc(q)}" placeholder="${esc(T('searchPh'))}"><span class="mag">🔍</span>`;
+  c.appendChild(s);
+  const inp=s.querySelector('#q');inp.focus();
+  inp.addEventListener('input',()=>{clearTimeout(inp._t);inp._t=setTimeout(()=>{
+    stack[stack.length-1]={screen:'search',param:inp.value.trim()};doSearch(c,inp.value.trim());},150);});
+  const holder=el('div');c.appendChild(holder);
+  doSearch(c,q,holder);
+}
+function doSearch(c,q,holder){
+  holder=holder||c.querySelector('#results');
+  let box=c.querySelector('#results');if(!box){box=el('div');box.id='results';c.appendChild(box);}
+  box.innerHTML='';
+  if(!q){return;}
+  // trees too
+  const treeHits=TREES.filter(t=>((L(t.title)+' '+t.title.he+' '+t.title.en).toLowerCase().includes(q.toLowerCase())));
+  treeHits.forEach(t=>{const d=el('div','troublecard');
+    d.innerHTML=`<span class="em">${t.em}</span><div><h3>${esc(L(t.title))}</h3><p>${esc(L(t.intro))}</p></div>`;
+    d.onclick=()=>go('tree',t.id);box.appendChild(d);});
+  const scored=ITEMS.map(it=>[it,searchScore(it,q)]).filter(x=>x[1]>0)
+    .sort((a,b)=>b[1]-a[1]||(itemSupported(b[0])?1:0)-(itemSupported(a[0])?1:0));
+  scored.forEach(([it])=>box.appendChild(itemRow(it)));
+  if(!scored.length&&!treeHits.length)box.appendChild(el('div','empty',esc(T('noResults'))));
+}
+
+function renderItem(c,id){
+  const it=ITEMS.find(x=>x.id===id);if(!it)return back();
+  c.appendChild(backBtn());
+  const d=el('div','detail');
+  const favOn=isFav(id);
+  d.innerHTML=`<div style="display:flex;align-items:flex-start;gap:10px">
+     <div style="flex:1"><h2>${esc(L(it.title))}</h2><p class="sub">${esc(L(it.desc))}</p></div>
+     <button class="favbtn ${favOn?'on':''}" id="favBtn" title="${esc(T('favs'))}">${favOn?'⭐':'☆'}</button></div>`;
+  // risk banner
+  const rk=it.risk;const rtxt=rk==='green'?T('riskGreen'):rk==='yellow'?T('riskYellow'):T('riskRed');
+  const rb=el('div','risk-banner '+rk);rb.innerHTML=`<span>${rk==='green'?'🟢':rk==='yellow'?'🟡':'🔴'}</span><span>${esc(rtxt)}</span>`;
+  d.appendChild(rb);
+  // meta
+  const meta=el('div','meta-row');
+  meta.innerHTML=`<span class="meta">🖥️ ${esc(verLabel(P.winVer))}</span>`+
+    (it.admin?`<span class="meta">🛡️ ${esc(T('admins'))}</span>`:'')+
+    (!itemSupported(it)?`<span class="meta" style="border-color:var(--red);color:var(--red)">${esc(T('notSupported'))}${esc(verLabel(P.winVer))}</span>`:'');
+  d.appendChild(meta);
+
+  // methods
+  const wh=el('div','block');wh.innerHTML=`<h4>${esc(T('waysHead'))}</h4>`;d.appendChild(wh);
+  const ms=bestMethods(it);
+  if(!ms.length){d.appendChild(el('div','warnbox',esc(T('notSupported'))+esc(verLabel(P.winVer))));}
+  ms.forEach(m=>d.appendChild(methodEl(m)));
+
+  // arch note
+  if(it.archNote){const b=el('div','block');b.innerHTML=`<h4>🧩 ${esc(T('archNote'))} · ${P.arch==='x64'?'64-bit':'32-bit'}</h4><div class="warnbox txt">${esc(L(it.archNote))}</div>`;d.appendChild(b);}
+  // before
+  if(it.before){const b=el('div','block');b.innerHTML=`<h4>⚠️ ${esc(T('before'))}</h4><div class="warnbox txt">${esc(L(it.before))}</div>`;d.appendChild(b);}
+  // expected ok
+  if(it.expectedOk){const b=el('div','block');b.innerHTML=`<h4>✅ ${esc(T('expectedOk'))}</h4><div class="okbox txt">${esc(L(it.expectedOk))}</div>`;d.appendChild(b);}
+  // errors
+  if(it.onError&&it.onError.length){const b=el('div','block');b.innerHTML=`<h4>❌ ${esc(T('onError'))}</h4>`;
+    it.onError.forEach(e=>{const x=el('div','errbox txt');x.innerHTML=`<b>${esc(L(e.when))}</b> — ${esc(L(e.fix))}`;b.appendChild(x);});d.appendChild(b);}
+  // undo
+  if(it.undo){const b=el('div','block');b.innerHTML=`<h4>↩️ ${esc(T('undo'))}</h4><div class="txt">${esc(L(it.undo))}</div>`;d.appendChild(b);}
+  // source
+  if(it.source){const b=el('div','block');b.innerHTML=`<a class="src" href="${esc(it.source)}" target="_blank" rel="noopener">🔗 ${esc(T('source'))}</a>`;d.appendChild(b);}
+
+  c.appendChild(d);
+  d.querySelector('#favBtn').onclick=(e)=>{toggleFav(id);const on=isFav(id);e.target.textContent=on?'⭐':'☆';e.target.classList.toggle('on',on);};
+}
+
+function methodEl(m){
+  const wrap=el('div','method'+(m.best?' best':''));
+  const lbl=L(METHOD_LABEL[m.type]||{en:m.type});
+  wrap.innerHTML=`<div class="mhead"><span>${methodEmoji(m.type)} ${esc(lbl)}</span>${m.best?`<span class="best-tag">${esc(T('best'))}</span>`:''}</div>`;
+  if(m.type==='gui'){
+    const path=guiPath(m);
+    const pv=el('div','gpath');
+    pv.innerHTML=String(path||'').split('←').map(s=>`<span class="step">${esc(s.trim())}</span>`).join('<span style="color:var(--muted)"> ← </span>');
+    wrap.appendChild(pv);
+  }else{
+    const row=el('div','cmdrow');
+    row.innerHTML=`<span class="cmd mono">${esc(m.value)}</span><button class="copybtn">${esc(T('copy'))}</button>`;
+    const btn=row.querySelector('.copybtn');
+    btn.onclick=()=>copyText(m.value,btn);
+    wrap.appendChild(row);
+    if(m.type==='shortcut'){/* shortcut isn't really copyable command but keep copy for convenience */}
+  }
+  return wrap;
+}
+function methodEmoji(t){return{shortcut:"⌨️",run:"▶️",cmd:"💻",powershell:"🔵",gui:"🖱️"}[t]||"•";}
+function copyText(txt,btn){
+  const done=()=>{if(btn){btn.textContent=T('copied');btn.classList.add('done');setTimeout(()=>{btn.textContent=T('copy');btn.classList.remove('done');},1400);}};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done).catch(()=>fallbackCopy(txt,done));}
+  else fallbackCopy(txt,done);
+}
+function fallbackCopy(txt,cb){const ta=el('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);cb&&cb();}
+
+function renderTree(c,id){
+  const t=TREES.find(x=>x.id===id);if(!t)return back();
+  c.appendChild(backBtn());
+  const h=el('div','hero');h.innerHTML=`<h1>${t.em} ${esc(L(t.title))}</h1><p>${esc(L(t.intro))}</p>`;c.appendChild(h);
+  c.appendChild(el('div','sectitle',esc(T('tryFlow'))));
+  t.steps.forEach((s,i)=>{
+    const d=el('div','tstep');
+    d.innerHTML=`<span class="num">${i+1}</span><div class="do">${esc(L(s.do))}</div>`;
+    if(s.cmd){const row=el('div','cmdrow');row.innerHTML=`<span class="cmd mono">${esc(s.cmd)}</span><button class="copybtn">${esc(T('copy'))}</button>`;
+      row.querySelector('.copybtn').onclick=e=>copyText(s.cmd,e.target);d.appendChild(row);}
+    d.appendChild(el('div','check',esc(L(s.check))));
+    c.appendChild(d);
+  });
+}
+
+function renderFavs(c){
+  c.appendChild(backBtn());
+  const h=el('div','hero');h.innerHTML=`<h1>⭐ ${esc(T('favs'))}</h1>`;c.appendChild(h);
+  const f=favs();const list=ITEMS.filter(i=>f.includes(i.id));
+  if(!list.length){c.appendChild(el('div','empty',esc(T('noFavs'))));return;}
+  list.forEach(it=>c.appendChild(itemRow(it)));
+}
+
+function renderAbout(c){
+  c.appendChild(backBtn());
+  const d=el('div','about');
+  d.innerHTML=`<div class="hero"><h1>ℹ️ ${esc(T('brand'))}</h1></div>
+   <div class="card">
+     <div><b>${esc(T('brand'))}</b> · v${APP_VERSION}</div>
+     <div>${P.uiLang==='he'?'פותח':'Developer'}: Barak Aflalo</div>
+     <div>${P.uiLang==='he'?'פלטפורמה':'Platform'}: PWA · HTML5</div>
+     <div>${P.uiLang==='he'?'אחסון':'Storage'}: ${P.uiLang==='he'?'על המכשיר בלבד':'on-device only'}</div>
+     <div>© AppNest 2026</div>
+   </div>
+   <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0">
+     <button class="btn" onclick="shareApp()">🔗 ${P.uiLang==='he'?'שתף את האפליקציה':'Share app'}</button>
+     <a class="btn" href="mailto:appnest55@gmail.com" style="text-decoration:none">✉️ ${P.uiLang==='he'?'שלח משוב':'Feedback'}</a>
+     <a class="btn" href="https://barakaflalo.github.io/appnest" target="_blank" rel="noopener" style="text-decoration:none">🏪 ${P.uiLang==='he'?'חנות AppNest':'AppNest store'}</a>
+     <a class="btn" href="privacy_policy.html?lang=${P.uiLang}" target="_blank" rel="noopener" style="text-decoration:none">🔒 ${P.uiLang==='he'?'מדיניות פרטיות':'Privacy policy'}</a>
+   </div>
+   <div class="disc">⚠️ ${esc(T('disclaimer'))}</div>`;
+  c.appendChild(d);
+}
+function shareApp(){const data={title:T('brand'),text:T('brand'),url:location.href};
+  if(navigator.share)navigator.share(data).catch(()=>{});else{copyText(location.href);alert(P.uiLang==='he'?'הקישור הועתק':'Link copied');}}
+
+function backBtn(){const b=el('button','btn ghost backbtn',esc(stack.length>1?T('back'):T('backHome')));b.onclick=()=>stack.length>1?back():go('home');return b;}
+
+/* ============================ SETUP MODAL ============================ */
+let draft={};
+function openSetup(){draft=Object.assign({},P);renderSetup();}
+function renderSetup(){
+  const m=document.getElementById('modal');
+  const verBtns=VERS.map(([id,lbl])=>`<button class="choice ${LEGACY.includes(id)?'legacy':''} ${draft.winVer===id?'sel':''}" onclick="setDraft('winVer','${id}')">Windows ${lbl}</button>`).join('');
+  m.innerHTML=`<div class="overlay" onclick="if(event.target===this)closeModal()"><div class="sheet">
+    <h2>${esc(T('setupTitle'))}</h2><p class="lead">${esc(T('setupLead'))}</p>
+
+    <div class="choice-lbl">${esc(T('uiLangL'))}</div>
+    <div class="choices">
+      <button class="choice ${draft.uiLang==='he'?'sel':''}" onclick="setDraft('uiLang','he')">עברית</button>
+      <button class="choice ${draft.uiLang==='en'?'sel':''}" onclick="setDraft('uiLang','en')">English</button>
+    </div>
+
+    <div class="choice-lbl">${esc(T('winVerL'))}</div>
+    <div class="choices">${verBtns}</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:6px">${esc(T('legacy'))}</div>
+    <button class="choice" style="margin-top:8px" onclick="toggleHint('hintVer')">❓ ${esc(T('dontKnow'))}</button>
+    <div class="hint" id="hintVer">${T('verHint')}</div>
+
+    <div class="choice-lbl">${esc(T('archL'))}</div>
+    <div class="choices">
+      <button class="choice ${draft.arch==='x64'?'sel':''}" onclick="setDraft('arch','x64')">64-bit (x64)</button>
+      <button class="choice ${draft.arch==='x86'?'sel':''}" onclick="setDraft('arch','x86')">32-bit (x86)</button>
+    </div>
+    <button class="choice" style="margin-top:8px" onclick="toggleHint('hintArch')">❓ ${esc(T('dontKnowArch'))}</button>
+    <div class="hint" id="hintArch">${T('archHint')}</div>
+
+    <div class="choice-lbl">${esc(T('sysLangL'))}</div>
+    <div class="choices">
+      <button class="choice ${draft.sysLang==='he'?'sel':''}" onclick="setDraft('sysLang','he')">עברית</button>
+      <button class="choice ${draft.sysLang==='en'?'sel':''}" onclick="setDraft('sysLang','en')">English</button>
+    </div>
+
+    <div class="foot">
+      <button class="btn primary block" onclick="saveSetup()">${esc(T('save'))}</button>
+    </div>
+    <div style="margin-top:10px"><button class="btn ghost block" onclick="skipSetup()">${esc(T('skip'))}</button></div>
+  </div></div>`;
+}
+function setDraft(k,v){draft[k]=v;renderSetup();/* keep hints open state simple: re-render */}
+function toggleHint(id){const e=document.getElementById(id);if(e)e.classList.toggle('show');}
+function saveSetup(){P=Object.assign(P,draft);saveProfile();store.set('pcg_setup','1');applyDir();closeModal();go('home');}
+function skipSetup(){P={uiLang:P.uiLang||'he',winVer:'win11',sysLang:P.uiLang||'he',arch:'x64'};saveProfile();store.set('pcg_setup','1');applyDir();closeModal();go('home');}
+function closeModal(){document.getElementById('modal').innerHTML='';}
+
+/* ============================ THEMES MODAL ============================ */
+function openThemes(){
+  const cur=document.documentElement.getAttribute('data-theme');
+  const sw=THEMES.map(t=>`<div class="sw ${t.id===cur?'on':''}" style="background:${t.bg};box-shadow:inset 0 0 0 3px ${t.c}" title="${esc(L(t))}" onclick="applyTheme('${t.id}');openThemes()"></div>`).join('');
+  document.getElementById('modal').innerHTML=`<div class="overlay" onclick="if(event.target===this)closeModal()"><div class="sheet" style="max-width:420px">
+    <h2>🎨 ${esc(T('themesTitle'))}</h2>
+    <div class="theme-swatches" style="margin-top:16px">${sw}</div>
+    <div style="margin-top:14px;color:var(--muted);font-size:13px">${THEMES.map(t=>L(t)).join(' · ')}</div>
+    <div class="foot"><button class="btn primary block" onclick="closeModal()">${P.uiLang==='he'?'סגור':'Close'}</button></div>
+  </div></div>`;
+}
+
+/* ============================ INIT ============================ */
+(function init(){
+  loadProfile();
+  applyDir();
+  applyTheme(store.get('pcg_theme')||'gold');
+  stack=[{screen:'home'}];
+  if(!store.get('pcg_setup')){renderHome(app());updateChip();document.getElementById('brandName').textContent=T('brand');openSetup();}
+  else{render('home');}
+})();
+
+/* Register the service worker when served over http(s). Skipped on file:// so
+   opening the raw file locally never throws. */
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{});});
+}
+</script>
+</body>
+</html>
