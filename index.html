@@ -182,7 +182,7 @@
 const store=(()=>{let mem={};try{const k='__t';localStorage.setItem(k,'1');localStorage.removeItem(k);
   return{get:k=>localStorage.getItem(k),set:(k,v)=>localStorage.setItem(k,v),del:k=>localStorage.removeItem(k)};}
   catch(e){return{get:k=>k in mem?mem[k]:null,set:(k,v)=>mem[k]=String(v),del:k=>delete mem[k]};}})();
-const APP_VERSION="1.2.0";
+const APP_VERSION="1.3.0";
 
 /* ============================ i18n (UI) ============================ */
 const LANG={
@@ -1299,6 +1299,7 @@ function renderSettings(c){
     <p class="sub">${esc(verLabel(P.winVer))} · ${P.arch==='x64'?'64-bit':'32-bit'} · ${P.sysLang==='he'?'עברית':'English'}</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
       <button class="btn" onclick="openSetup()">${he?'שנה הגדרות מחשב':'Change PC settings'}</button>
+      <button class="btn" onclick="openOnboarding(true)">${he?'📖 מדריך שימוש':'📖 How-to guide'}</button>
       <button class="btn ghost" id="clearAll" style="border-color:var(--red);color:var(--red)">${he?'מחק את כל הנתונים':'Delete all data'}</button>
     </div>`;
   c.appendChild(dz);
@@ -1382,6 +1383,52 @@ function saveSetup(){P=Object.assign(P,draft);saveProfile();store.set('pcg_setup
 function skipSetup(){P={uiLang:P.uiLang||'he',winVer:'win11',sysLang:P.uiLang||'he',arch:'x64'};saveProfile();store.set('pcg_setup','1');applyDir();closeModal();go('home');}
 function closeModal(){document.getElementById('modal').innerHTML='';}
 
+/* ============================ ONBOARDING (first-run guide) ============================ */
+const OB_STEPS=[
+ {em:"🖥️",title:{he:"ברוך הבא למדריך המחשב",en:"Welcome to PC Guide"},
+  body:{he:"כל הפקודות, קיצורי המקשים ותיקוני התקלות של Windows במקום אחד. עובד אופליין, בלי חשבון ובלי פרסומות.",en:"Every Windows command, keyboard shortcut and fix in one place. Works offline, no account, no ads."}},
+ {em:"⚙️",title:{he:"מותאם למחשב שלך",en:"Tailored to your PC"},
+  body:{he:"נבחר יחד את גרסת ה-Windows, הארכיטקטורה (32/64 סיביות) ושפת המערכת — וכל דרך תוצג בדיוק כפי שמתאים למחשב שלך.",en:"We'll pick your Windows version, architecture (32/64-bit) and system language — every step is then shown exactly as it fits your machine."}},
+ {em:"🚦",title:{he:"רמות סיכון ברורות",en:"Clear risk levels"},
+  body:{he:"כל פקודה מסומנת: 🟢 מציגה מידע · 🟡 משנה הגדרות · 🔴 עלולה למחוק או לשבור. לפקודות מסוכנות תמיד יש 'לפני שמריצים' ו'איך מבטלים'.",en:"Every command is marked: 🟢 shows info · 🟡 changes settings · 🔴 may delete or break. Risky ones always include 'before you run' and 'how to undo'."}},
+ {em:"📋",title:{he:"לומדת ומעתיקה — לא מריצה",en:"It teaches & copies — never runs"},
+  body:{he:"מטעמי אבטחה הדפדפן לא מריץ פקודות בעצמו. לוחצים 'העתק', מדביקים בשורת הפקודה ומריצים — באחריותך.",en:"For security the browser can't run commands itself. Tap 'Copy', paste into the terminal and run — at your own risk."}},
+ {em:"🪄",title:{he:"נתקעת? יש עזרה",en:"Stuck? There's help"},
+  body:{he:"עצי תקלות מודרכים ('האינטרנט לא עובד', 'אין קול'…) ועוזר AI אופציונלי שעונה בשפה טבעית. בוא נתחיל!",en:"Guided troubleshooting flows ('no internet', 'no sound'…) and an optional AI assistant that answers in plain language. Let's start!"}},
+];
+let obStep=0, obFromSettings=false;
+function openOnboarding(fromSettings){obStep=0;obFromSettings=!!fromSettings;renderOnboarding();}
+function renderOnboarding(){
+  const he=P.uiLang==='he';const s=OB_STEPS[obStep];const last=obStep===OB_STEPS.length-1;
+  const dots=OB_STEPS.map((_,i)=>`<span style="width:8px;height:8px;border-radius:50%;background:${i===obStep?'var(--accent)':'var(--border)'};display:inline-block"></span>`).join('');
+  document.getElementById('modal').innerHTML=`<div class="overlay"><div class="sheet" style="max-width:440px;text-align:center">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;gap:6px">
+        <button class="choice ${he?'sel':''}" style="padding:4px 11px;font-size:12px" onclick="obLang('he')">עברית</button>
+        <button class="choice ${!he?'sel':''}" style="padding:4px 11px;font-size:12px" onclick="obLang('en')">EN</button>
+      </div>
+      <button class="btn ghost" style="padding:5px 12px;font-size:13px" onclick="obFinish()">${he?'דלג':'Skip'}</button>
+    </div>
+    <div style="font-size:58px;margin:20px 0 6px;line-height:1">${s.em}</div>
+    <h2 style="font-size:22px;margin:0 0 10px">${esc(L(s.title))}</h2>
+    <p style="color:var(--muted);font-size:15px;line-height:1.65;margin:0 auto;max-width:340px">${esc(L(s.body))}</p>
+    <div style="display:flex;gap:7px;justify-content:center;margin:24px 0 18px">${dots}</div>
+    <div style="display:flex;gap:10px">
+      ${obStep>0?`<button class="btn" style="flex:1" onclick="obPrev()">${he?'⟵ הקודם':'⟵ Back'}</button>`:''}
+      <button class="btn primary" style="flex:2" onclick="${last?'obFinish()':'obNext()'}">${last?(he?'בוא נתחיל ✓':"Let's start ✓"):(he?'הבא ⟶':'Next ⟶')}</button>
+    </div>
+  </div></div>`;
+}
+function obLang(l){P.uiLang=l;saveProfile();applyDir();renderOnboarding();}
+function obNext(){if(obStep<OB_STEPS.length-1){obStep++;renderOnboarding();}}
+function obPrev(){if(obStep>0){obStep--;renderOnboarding();}}
+function obFinish(){
+  store.set('pcg_onboarded','1');closeModal();
+  if(obFromSettings){go('home');}
+  else if(!store.get('pcg_setup')){openSetup();}
+  else{go('home');}
+}
+
 /* ============================ THEMES MODAL ============================ */
 function openThemes(){
   const cur=document.documentElement.getAttribute('data-theme');
@@ -1454,8 +1501,9 @@ window.APPNEST_ASSISTANT_CONFIG={
   applyDir();
   applyTheme(store.get('pcg_theme')||'gold');
   stack=[{screen:'home'}];
-  if(!store.get('pcg_setup')){renderHome(app());updateChip();document.getElementById('brandName').textContent=T('brand');openSetup();}
-  else{render('home');}
+  render('home');
+  if(!store.get('pcg_onboarded')){openOnboarding();}
+  else if(!store.get('pcg_setup')){openSetup();}
 })();
 
 /* Register the service worker when served over http(s). Skipped on file:// so
